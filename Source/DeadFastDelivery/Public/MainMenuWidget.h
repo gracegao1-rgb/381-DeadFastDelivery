@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/WidgetSwitcher.h"
 #include "MainMenuWidget.generated.h"
 
 /**
@@ -14,4 +15,12 @@ class DEADFASTDELIVERY_API UMainMenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+protected:
+	virtual void NativeOnInitialized() override;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UWidgetSwitcher> PageSwitcher;
+
+	UFUNCTION()
+	void HandleSwitchPage(int32 TargetIndex);
 };
