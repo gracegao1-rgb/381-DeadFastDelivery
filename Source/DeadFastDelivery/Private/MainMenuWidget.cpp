@@ -34,12 +34,16 @@ void UMainMenuWidget::HandleAction(EMenuActions Action)
 {
 	switch (Action)
 	{
-		case EMenuActions::QuitGame:
-			QuitGame();
-			break;
-		case EMenuActions::LoadLevelTutorial:
-			LoadLevel(TEXT("/Game/Levels/Lvl_Tutorial"));
-		default:
+	case EMenuActions::QuitGame:
+		QuitGame();
+		break;
+	case EMenuActions::LoadLevelTutorial:
+		LoadLevel(TEXT("/Game/Levels/Lvl_Tutorial"));
+		break;
+	case EMenuActions::LoadLevelMet:
+		LoadLevel(TEXT("/Game/Levels/Lvl_THE_MET"));
+		break;
+	default:
 		break;
 	}
 }

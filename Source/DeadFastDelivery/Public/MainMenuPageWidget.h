@@ -9,6 +9,7 @@ enum EMenuActions : uint8
 {
 	QuitGame,
 	LoadLevelTutorial,
+	LoadLevelMet
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSwitchPage, int32, TargetIndex);
