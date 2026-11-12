@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MainMenuPageWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/WidgetSwitcher.h"
 #include "MainMenuWidget.generated.h"
@@ -23,4 +24,11 @@ protected:
 
 	UFUNCTION()
 	void HandleSwitchPage(int32 TargetIndex);
+	
+	UFUNCTION()
+	void HandleAction(EMenuActions Action);
+	
+private:
+	void QuitGame() const;
+	void LoadLevel(FName LevelName) const;
 };

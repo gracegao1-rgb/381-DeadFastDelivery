@@ -3,6 +3,8 @@
 
 #include "MainMenuWidget.h"
 #include "MainMenuPageWidget.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void UMainMenuWidget::NativeOnInitialized()
 {
@@ -16,6 +18,7 @@ void UMainMenuWidget::NativeOnInitialized()
 		if (UMainMenuPageWidget* Page = Cast<UMainMenuPageWidget>(Child))
 		{
 			Page->OnSwitchPage.AddDynamic(this, &UMainMenuWidget::HandleSwitchPage);
+			Page->OnAction.AddDynamic(this, &UMainMenuWidget::HandleAction);
 		}
 	}
 
@@ -25,4 +28,34 @@ void UMainMenuWidget::NativeOnInitialized()
 void UMainMenuWidget::HandleSwitchPage(int32 TargetIndex)
 {
 	PageSwitcher->SetActiveWidget(PageSwitcher->GetWidgetAtIndex(TargetIndex));
+}
+
+void UMainMenuWidget::HandleAction(EMenuActions Action)
+{
+	switch (Action)
+	{
+		case EMenuActions::QuitGame:
+			QuitGame();
+			break;
+		case EMenuActions::LoadLevelTutorial:
+			LoadLevel(TEXT("/Game/Levels/Lvl_Tutorial"));
+		default:
+		break;
+	}
+}
+
+
+void UMainMenuWidget::QuitGame() const
+{
+	UKismetSystemLibrary::QuitGame(
+		GetWorld(),
+		nullptr, 
+		EQuitPreference::Quit,
+		false
+	);
+}
+
+void UMainMenuWidget::LoadLevel(FName LevelName) const
+{
+	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
 }
