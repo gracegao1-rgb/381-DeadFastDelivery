@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "HandsComponent.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "DeadFastDeliveryCharacter.generated.h"
@@ -30,9 +31,12 @@ class ADeadFastDeliveryCharacter : public ACharacter
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
-
+	
+	
 protected:
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UHandsComponent* HandsComponent;
+	
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* JumpAction;

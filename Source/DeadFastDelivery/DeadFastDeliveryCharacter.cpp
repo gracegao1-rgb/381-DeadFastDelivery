@@ -42,6 +42,10 @@ ADeadFastDeliveryCharacter::ADeadFastDeliveryCharacter()
 	// Configure character movement
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
+	
+	// Attach Hands
+	HandsComponent = CreateDefaultSubobject<UHandsComponent>(TEXT("HandsComponent"));
+	HandsComponent->SetupAttachment(GetMesh(), FName("HandsSocket")); // attached to player's body
 }
 
 void ADeadFastDeliveryCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
