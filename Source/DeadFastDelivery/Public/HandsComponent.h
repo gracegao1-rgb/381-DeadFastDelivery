@@ -17,6 +17,9 @@ public:
 	UHandsComponent();
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	FVector LeftHandRelativeOffset = FVector(0.f, 0.f, 0.f);
+	FVector RightHandRelativeOffset = FVector(0.f,  0.f, 0.f);
 
 protected:
 	virtual void BeginPlay() override;
@@ -30,5 +33,6 @@ protected:
 private:
 	USphereComponent* CreateHand(const FName Name, const FVector& RelativeLocation);
 
-		
+	FVector LeftHandRelativeLocation = FVector(150.f, 40.f, -10.f);
+	FVector RightHandRelativeLocation = FVector(150.f,  -40.f, -10.f);
 };
