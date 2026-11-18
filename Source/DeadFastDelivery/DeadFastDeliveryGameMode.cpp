@@ -2,11 +2,13 @@
 
 #include "DeadFastDeliveryGameMode.h"
 
+#include "MyHUD.h"
 #include "MyWorldSettings.h"
 
 ADeadFastDeliveryGameMode::ADeadFastDeliveryGameMode()
 {
-	// stub
+	// Set HUD
+	HUDClass = AMyHUD::StaticClass();
 }
 
 // Import per-level settings from WorldSettings
@@ -31,15 +33,6 @@ void ADeadFastDeliveryGameMode::UpdateCountdown()
 	if (LevelSeconds > 0.0f)
 	{
 		LevelSeconds -= 1;
-		
-		FString TimeMessage = FString::Printf(TEXT("Current Time: %f"), LevelSeconds);
-		GEngine->AddOnScreenDebugMessage(
-			1,
-			2.0f,
-			FColor::Green, 
-			TimeMessage        
-		);
-		
 	}
 	else
 	{
@@ -52,4 +45,9 @@ void ADeadFastDeliveryGameMode::UpdateCountdown()
 			TEXT("Timer Ended")        
 		);
 	}
+}
+
+float ADeadFastDeliveryGameMode::GetTimeRemaining() const
+{
+	return LevelSeconds;
 }

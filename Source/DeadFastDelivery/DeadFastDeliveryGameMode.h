@@ -17,6 +17,8 @@ class ADeadFastDeliveryGameMode : public AGameModeBase
 public:
 	ADeadFastDeliveryGameMode();
 	
+	float GetTimeRemaining() const;
+	
 protected:
 	virtual void BeginPlay() override;
 	

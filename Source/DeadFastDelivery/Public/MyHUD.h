@@ -1,0 +1,30 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "HUDWidget.h"
+#include "GameFramework/HUD.h"
+#include "MyHUD.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class DEADFASTDELIVERY_API AMyHUD : public AHUD
+{
+	GENERATED_BODY()
+	
+public:
+	AMyHUD();
+	
+	virtual void Tick(float DeltaSeconds) override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UHUDWidget> HUDWidgetClass;
+	
+protected:
+	virtual void BeginPlay() override;
+	
+	UPROPERTY() UHUDWidget* HUDWidget;
+};
