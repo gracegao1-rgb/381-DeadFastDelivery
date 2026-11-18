@@ -71,7 +71,6 @@ void UHandsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	const FVector Origin = OwnerPawn->GetPawnViewLocation();
 	const FVector DesiredLocLeft = Origin + ControlRot.RotateVector(LeftHandRelativeLocation + LeftHandRelativeOffset);
 	const FVector DesiredLocRight = Origin + ControlRot.RotateVector(RightHandRelativeLocation + RightHandRelativeOffset);
-	GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, FString::Printf(TEXT("Pitch: %f"), ControlRot.Pitch));
 	
 	if (LeftHand && RightHand)
 	{

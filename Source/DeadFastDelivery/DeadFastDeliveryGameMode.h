@@ -16,6 +16,18 @@ class ADeadFastDeliveryGameMode : public AGameModeBase
 
 public:
 	ADeadFastDeliveryGameMode();
+	
+protected:
+	virtual void BeginPlay() override;
+	
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+	
+	void UpdateCountdown();
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Tuning", meta = (ClampMin = "0.0", Units = "s"))
+	float LevelSeconds = 300.f;
+	
+	FTimerHandle LevelTimer;
 };
 
 
