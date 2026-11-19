@@ -63,6 +63,15 @@ void ADeadFastDeliveryCharacter::SetupPlayerInputComponent(UInputComponent* Play
 		// Looking/Aiming
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADeadFastDeliveryCharacter::LookInput);
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ADeadFastDeliveryCharacter::LookInput);
+		
+		// Rotating arms
+		EnhancedInputComponent->BindAction(HandRotateAction, ETriggerEvent::Triggered, this, &ADeadFastDeliveryCharacter::HandRotate);
+		EnhancedInputComponent->BindAction(HandScrollAction, ETriggerEvent::Triggered, this, &ADeadFastDeliveryCharacter::HandScroll);
+		EnhancedInputComponent->BindAction(AltAction, ETriggerEvent::Started,this, &ADeadFastDeliveryCharacter::AltPressed);
+		EnhancedInputComponent->BindAction(AltAction, ETriggerEvent::Completed, this, &ADeadFastDeliveryCharacter::AltReleased);
+		
+		// toggle/switch arm
+		EnhancedInputComponent->BindAction(ToggleHandAction, ETriggerEvent::Started, this, &ADeadFastDeliveryCharacter::ToggleHand);
 	}
 	else
 	{
@@ -121,4 +130,51 @@ void ADeadFastDeliveryCharacter::DoJumpEnd()
 {
 	// pass StopJumping to the character
 	StopJumping();
+}
+
+void ADeadFastDeliveryCharacter::ApplyHandRotation(float DeltaPitch, float DeltaYaw)
+{
+	if (!HandsComponent) return;
+
+	FRotator& Rot = bControlRightHand ? RightHandRot : LeftHandRot;
+	if (bControlRightHand)
+	{
+		Rot.Pitch = FMath::Clamp(Rot.Pitch + DeltaPitch,RightMinPitch,RightMaxPitch);
+		Rot.Yaw = FMath::Clamp(Rot.Yaw + DeltaYaw,RightMinYaw,RightMaxYaw);
+		Rot.Roll = 0.f;
+	}
+	else
+	{
+		Rot.Pitch = FMath::Clamp(Rot.Pitch + DeltaPitch,LeftMinPitch,LeftMaxPitch);
+		Rot.Yaw = FMath::Clamp(Rot.Yaw + DeltaYaw,LeftMinYaw,LeftMaxYaw);
+		Rot.Roll = 0.f;
+	}
+
+	HandsComponent->SetHandRotation(bControlRightHand, Rot);
+}
+
+void ADeadFastDeliveryCharacter::HandRotate(const FInputActionValue& Value)
+{
+	const FVector2D In = Value.Get<FVector2D>();
+	const float Dt = GetWorld()->GetDeltaSeconds();
+	ApplyHandRotation(In.Y * RotSpeed * Dt, In.X * RotSpeed * Dt);
+}
+
+void ADeadFastDeliveryCharacter::HandScroll(const FInputActionValue& Value)
+{
+	const float Notch = Value.Get<float>() * ScrollStep; // no delta time
+
+	if (bAltHeld)
+	{
+		ApplyHandRotation(0.f, Notch); // yaw (left/right)
+	}
+	else
+	{
+		ApplyHandRotation(Notch, 0.f); // pitch (up/down)
+	}
+}
+
+void ADeadFastDeliveryCharacter::ToggleHand()
+{
+	bControlRightHand = !bControlRightHand;
 }

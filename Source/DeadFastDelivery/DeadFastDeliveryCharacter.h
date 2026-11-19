@@ -80,11 +80,46 @@ protected:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
 
-protected:
-
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	
+	// for arm rotation
+	UPROPERTY(EditAnywhere, Category="Input") UInputAction* HandRotateAction;
+	UPROPERTY(EditAnywhere, Category="Input") UInputAction* HandScrollAction;
+	UPROPERTY(EditAnywhere, Category="Input") UInputAction* AltAction;
+
+	UPROPERTY(EditAnywhere, Category="Hand") float RotSpeed = 90.f; // deg/sec for arrows
+	UPROPERTY(EditAnywhere, Category="Hand") float ScrollStep = 5.f; // deg per wheel notch
+
+	bool bAltHeld = false;
+
+	void HandRotate(const FInputActionValue& Value);
+	void HandScroll(const FInputActionValue& Value);
+	void AltPressed() { bAltHeld = true; }
+	void AltReleased() { bAltHeld = false; }
+	
+	FRotator RightHandRot = FRotator::ZeroRotator;
+	FRotator LeftHandRot = FRotator::ZeroRotator;
+	void ApplyHandRotation(float DeltaPitch, float DeltaYaw);
+	
+	UPROPERTY(EditAnywhere, Category="Hands|Limits") float RightMinPitch = -30.f;
+	UPROPERTY(EditAnywhere, Category="Hands|Limits") float RightMaxPitch = 30.f;
+	UPROPERTY(EditAnywhere, Category="Hands|Limits") float RightMinYaw = -50.f;
+	UPROPERTY(EditAnywhere, Category="Hands|Limits") float RightMaxYaw = 50.f;
+	
+	UPROPERTY(EditAnywhere, Category="Hands|Limits") float LeftMinPitch = -30.f;
+	UPROPERTY(EditAnywhere, Category="Hands|Limits") float LeftMaxPitch = 30.f;
+	UPROPERTY(EditAnywhere, Category="Hands|Limits") float LeftMinYaw = -50.f;
+	UPROPERTY(EditAnywhere, Category="Hands|Limits") float LeftMaxYaw = 50.f;
+	
+	// toggle/switch hand
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ToggleHandAction;
+	
+	// default to right hand
+	bool bControlRightHand = true;
+
+	void ToggleHand();
 
 public:
 
