@@ -40,6 +40,7 @@ void AMyHUD::BeginPlay()
 	if (PauseMenuWidgetClass)
 	{
 		PauseMenuWidget = CreateWidget<UPauseMenuWidget>(GetOwningPlayerController(), PauseMenuWidgetClass);
+		if (PauseMenuWidget) PauseMenuWidget->AddToViewport(10);
 	}
 }
 
@@ -59,10 +60,12 @@ void AMyHUD::TogglePauseMenu() const
 {
 	if (!bIsPaused)
 	{
-		PauseMenuWidget->AddToViewport(10);
+		if (PauseMenuWidget)
+			PauseMenuWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 	else
 	{
-		PauseMenuWidget->RemoveFromParent();
+		if (PauseMenuWidget)
+			PauseMenuWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }

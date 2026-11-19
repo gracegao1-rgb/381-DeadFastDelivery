@@ -9,6 +9,7 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DeadFastDelivery.h"
+#include "MyHUD.h"
 
 ADeadFastDeliveryCharacter::ADeadFastDeliveryCharacter()
 {
@@ -76,6 +77,10 @@ void ADeadFastDeliveryCharacter::SetupPlayerInputComponent(UInputComponent* Play
 		// Grab object
 		EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Started, HandsComponent, &UHandsComponent::StartGrabbing);
 		EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Completed, HandsComponent, &UHandsComponent::StopGrabbing);
+		
+		// Pause menu
+		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Completed, this, &ADeadFastDeliveryCharacter::TogglePause);
+		
 	}
 	else
 	{
@@ -182,4 +187,18 @@ void ADeadFastDeliveryCharacter::HandScroll(const FInputActionValue& Value)
 void ADeadFastDeliveryCharacter::ToggleHand()
 {
 	HandOption = (HandOption + 1) % 3;
+}
+
+void ADeadFastDeliveryCharacter::TogglePause()
+{
+	if (AController* ControllerRef = GetController())
+	{
+		if (APlayerController* PC = Cast<APlayerController>(ControllerRef))
+		{
+			if (AMyHUD* MyHUD = Cast<AMyHUD>(PC->GetHUD()))
+			{
+				MyHUD->TogglePauseMenu();
+			}
+		}
+	}
 }

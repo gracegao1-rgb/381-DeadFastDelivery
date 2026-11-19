@@ -84,6 +84,10 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	
 	UPROPERTY(EditAnywhere, Category="Input") UInputAction* GrabAction;
+
+	UPROPERTY(EditAnywhere, Category="Input") UInputAction* PauseAction;
+	
+	virtual void TogglePause();
 	
 	// for arm rotation
 	UPROPERTY(EditAnywhere, Category="Input") UInputAction* HandRotateAction;
