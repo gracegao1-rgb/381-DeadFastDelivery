@@ -121,6 +121,10 @@ protected:
 	// toggle/switch hand
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ToggleHandAction;
+	
+	// toggle drift
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ToggleDriftAction;
 
 	/**
 	 * 0 - Both hands (default)
@@ -130,6 +134,11 @@ protected:
 	int HandOption = 0;
 
 	void ToggleHand();
+	
+	void Tick(float DeltaTime);
+	bool bShouldDriftDown = false;
+	
+	void ToggleDrift();
 
 public:
 

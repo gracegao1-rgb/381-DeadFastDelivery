@@ -81,6 +81,8 @@ void ADeadFastDeliveryCharacter::SetupPlayerInputComponent(UInputComponent* Play
 		// Pause menu
 		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Completed, this, &ADeadFastDeliveryCharacter::TogglePause);
 		
+		// toggle drift
+		EnhancedInputComponent->BindAction(ToggleDriftAction, ETriggerEvent::Started, this, &ADeadFastDeliveryCharacter::ToggleDrift);
 	}
 	else
 	{
@@ -88,6 +90,19 @@ void ADeadFastDeliveryCharacter::SetupPlayerInputComponent(UInputComponent* Play
 	}
 }
 
+void ADeadFastDeliveryCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (bShouldDriftDown)
+	{
+		// Adjust this value to control how fast the camera sinks
+		float DriftSpeed = 5.0f; 
+
+		// drift down
+		AddControllerPitchInput(DriftSpeed * DeltaTime);
+	}
+}
 
 void ADeadFastDeliveryCharacter::MoveInput(const FInputActionValue& Value)
 {
@@ -201,4 +216,9 @@ void ADeadFastDeliveryCharacter::TogglePause()
 			}
 		}
 	}
+}
+
+void ADeadFastDeliveryCharacter::ToggleDrift()
+{
+	bShouldDriftDown = !bShouldDriftDown;
 }
