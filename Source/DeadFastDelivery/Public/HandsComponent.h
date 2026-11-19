@@ -41,7 +41,7 @@ public:
 	FVector RightPivotLoc = FVector(0, 20, 0);
 	FVector HandOffset = FVector(150, 0, 0); // rest offset from the pivot
 
-	void SetHandRotation(bool bRight, const FRotator& Rot);
+	void SetHandRotation(int HandOption, const FRotator& Rot);
 	
 	UPROPERTY(EditAnywhere, Category="Hands|Physics") float HandMassKg = 50.f;
 	UPROPERTY(EditAnywhere, Category="Hands|Physics") float HandStiffness = 400.f;

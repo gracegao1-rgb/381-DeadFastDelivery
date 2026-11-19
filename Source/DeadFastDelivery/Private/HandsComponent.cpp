@@ -101,8 +101,17 @@ void UHandsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 }
 
 
-void UHandsComponent::SetHandRotation(bool bRight, const FRotator& Rot)
+void UHandsComponent::SetHandRotation(int HandOption, const FRotator& Rot)
 {
-	(bRight ? RightHandRot : LeftHandRot) = Rot;
+	if (HandOption == 1)
+	{
+		// right hand
+		RightHandRot = Rot;
+	}
+	if(HandOption == 2)
+	{
+		// left hand
+		LeftHandRot = Rot;
+	}
 }
 

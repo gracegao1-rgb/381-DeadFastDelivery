@@ -136,21 +136,22 @@ void ADeadFastDeliveryCharacter::ApplyHandRotation(float DeltaPitch, float Delta
 {
 	if (!HandsComponent) return;
 
-	FRotator& Rot = bControlRightHand ? RightHandRot : LeftHandRot;
-	if (bControlRightHand)
+	if (HandOption == 0 || HandOption == 1)
 	{
+		FRotator& Rot = RightHandRot;
 		Rot.Pitch = FMath::Clamp(Rot.Pitch + DeltaPitch,RightMinPitch,RightMaxPitch);
 		Rot.Yaw = FMath::Clamp(Rot.Yaw + DeltaYaw,RightMinYaw,RightMaxYaw);
 		Rot.Roll = 0.f;
+		HandsComponent->SetHandRotation(1, Rot);
 	}
-	else
+	if (HandOption == 0 || HandOption == 2)
 	{
+		FRotator& Rot = LeftHandRot;
 		Rot.Pitch = FMath::Clamp(Rot.Pitch + DeltaPitch,LeftMinPitch,LeftMaxPitch);
-		Rot.Yaw = FMath::Clamp(Rot.Yaw + DeltaYaw,LeftMinYaw,LeftMaxYaw);
+		Rot.Yaw = FMath::Clamp(Rot.Yaw - DeltaYaw,LeftMinYaw,LeftMaxYaw);
 		Rot.Roll = 0.f;
+		HandsComponent->SetHandRotation(2, Rot);
 	}
-
-	HandsComponent->SetHandRotation(bControlRightHand, Rot);
 }
 
 void ADeadFastDeliveryCharacter::HandRotate(const FInputActionValue& Value)
@@ -166,15 +167,15 @@ void ADeadFastDeliveryCharacter::HandScroll(const FInputActionValue& Value)
 
 	if (bAltHeld)
 	{
-		ApplyHandRotation(0.f, Notch); // yaw (left/right)
+		ApplyHandRotation(Notch, 0.f); // pitch (up/down)
 	}
 	else
 	{
-		ApplyHandRotation(Notch, 0.f); // pitch (up/down)
+		ApplyHandRotation(0.f, Notch); // yaw (left/right)
 	}
 }
 
 void ADeadFastDeliveryCharacter::ToggleHand()
 {
-	bControlRightHand = !bControlRightHand;
+	HandOption = (HandOption + 1) % 3;
 }

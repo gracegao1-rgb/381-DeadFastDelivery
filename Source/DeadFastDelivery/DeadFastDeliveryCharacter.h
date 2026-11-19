@@ -115,9 +115,13 @@ protected:
 	// toggle/switch hand
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ToggleHandAction;
-	
-	// default to right hand
-	bool bControlRightHand = true;
+
+	/**
+	 * 0 - Both hands (default)
+	 * 1 - right hand
+	 * 2 - left hand
+	 */
+	int HandOption = 0;
 
 	void ToggleHand();
 
