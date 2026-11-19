@@ -2,8 +2,10 @@
 
 #include "DeadFastDeliveryGameMode.h"
 
+#include "DeliveryItem.h"
 #include "MyHUD.h"
 #include "MyWorldSettings.h"
+#include "Kismet/GameplayStatics.h"
 
 ADeadFastDeliveryGameMode::ADeadFastDeliveryGameMode()
 {
@@ -26,6 +28,11 @@ void ADeadFastDeliveryGameMode::BeginPlay()
 {
 	// Start timer
 	GetWorldTimerManager().SetTimer(LevelTimer, this, &ADeadFastDeliveryGameMode::UpdateCountdown, 1.0f, true);
+	
+	// Determine number of items to deliver
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADeliveryItem::StaticClass(), FoundActors);
+	TotalNumberOfItems = FoundActors.Num();
 }
 
 void ADeadFastDeliveryGameMode::UpdateCountdown()
@@ -50,4 +57,31 @@ void ADeadFastDeliveryGameMode::UpdateCountdown()
 float ADeadFastDeliveryGameMode::GetTimeRemaining() const
 {
 	return LevelSeconds;
+}
+
+int32 ADeadFastDeliveryGameMode::GetTotalNumberOfItems() const
+{
+	return TotalNumberOfItems;
+}
+
+int32 ADeadFastDeliveryGameMode::GetNumberOfDeliveredItems() const
+{
+	return NumberOfDeliveredItems;
+}
+
+void ADeadFastDeliveryGameMode::UpdateNumberOfDeliveredItems()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADeliveryItem::StaticClass(), FoundActors);
+	
+	int32 Count = 0;
+	for (AActor* Actor : FoundActors)
+	{
+		ADeliveryItem* Item = Cast<ADeliveryItem>(Actor);
+		if (Item->bIsDelivered)
+		{
+			Count++;
+		}
+	}
+	NumberOfDeliveredItems = Count;
 }

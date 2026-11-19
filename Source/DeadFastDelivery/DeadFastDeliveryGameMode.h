@@ -19,6 +19,12 @@ public:
 	
 	float GetTimeRemaining() const;
 	
+	int32 GetTotalNumberOfItems() const;
+	
+	int32 GetNumberOfDeliveredItems() const;
+	
+	void UpdateNumberOfDeliveredItems();
+	
 protected:
 	virtual void BeginPlay() override;
 	
@@ -30,6 +36,10 @@ protected:
 	float LevelSeconds = 300.f;
 	
 	FTimerHandle LevelTimer;
+	
+	int32 TotalNumberOfItems = 0;
+	
+	int32 NumberOfDeliveredItems = 0;
 };
 
 

@@ -9,3 +9,8 @@ void UHUDWidget::SetTimeRemaining(int32 Seconds) const
 	int32 const SecondsLeft = static_cast<int32>(Seconds % 60);
 	TimeText->SetText(FText::FromString(FString::Printf(TEXT("%02d:%02d"), MinutesLeft, SecondsLeft)));
 }
+
+void UHUDWidget::SetDeliveredItems(int32 DeliveredItems, int32 TotalNumberOfItems) const
+{
+	DeliveredText->SetText(FText::FromString(FString::Printf(TEXT("%d/%d Delivered"), DeliveredItems, TotalNumberOfItems)));
+}

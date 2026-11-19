@@ -3,6 +3,8 @@
 
 #include "DeliveryItem.h"
 
+#include "DeadFastDeliveryGameMode.h"
+
 // Sets default values
 ADeliveryItem::ADeliveryItem()
 {
@@ -44,6 +46,11 @@ void ADeliveryItem::HandleStartZoneOverlap(int Zone)
 			Mesh->SetOverlayMaterial(GreenGlowMaterial);
 		}
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green,TEXT("Object delivered!"));
+		
+		if (ADeadFastDeliveryGameMode* Gm = GetWorld()->GetAuthGameMode<ADeadFastDeliveryGameMode>())
+		{
+			Gm->UpdateNumberOfDeliveredItems();
+		}
 	}
 	else
 	{
@@ -57,6 +64,10 @@ void ADeliveryItem::HandleEndZoneOverlap()
 	if (Mesh)
 	{
 		Mesh->SetOverlayMaterial(nullptr);
+	}
+	if (ADeadFastDeliveryGameMode* Gm = GetWorld()->GetAuthGameMode<ADeadFastDeliveryGameMode>())
+	{
+		Gm->UpdateNumberOfDeliveredItems();
 	}
 }
 

@@ -51,6 +51,7 @@ void AMyHUD::Tick(float DeltaSeconds)
 	if (const ADeadFastDeliveryGameMode* Gm = GetWorld()->GetAuthGameMode<ADeadFastDeliveryGameMode>())
 	{
 		HUDWidget->SetTimeRemaining(Gm->GetTimeRemaining());
+		HUDWidget->SetDeliveredItems(Gm->GetNumberOfDeliveredItems(), Gm->GetTotalNumberOfItems());
 	}
 }
 
