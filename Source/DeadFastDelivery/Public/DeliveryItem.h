@@ -27,6 +27,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Materials")
 	class UMaterialInterface* GreenGlowMaterial;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Materials")
+	class UMaterialInterface* RedGlowMaterial;
+	
 	// Delivery object's identifier should match the zone identifier
 	UPROPERTY(EditAnywhere, Category = "Tuning")
 	int ZoneIdentifier = 0;

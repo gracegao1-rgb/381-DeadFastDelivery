@@ -27,6 +27,11 @@ ADeliveryItem::ADeliveryItem()
 	{
 		GreenGlowMaterial = MaterialAsset.Object;
 	}
+	ConstructorHelpers::FObjectFinder<UMaterialInterface> MaterialAsset2(TEXT("/Game/Materials/M_GlowingAuraRed.M_GlowingAuraRed"));
+	if (MaterialAsset2.Succeeded())
+	{
+		RedGlowMaterial = MaterialAsset2.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -54,6 +59,10 @@ void ADeliveryItem::HandleStartZoneOverlap(int Zone)
 	}
 	else
 	{
+		if (Mesh && RedGlowMaterial)
+		{
+			Mesh->SetOverlayMaterial(RedGlowMaterial);
+		}
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red,TEXT("Object delivered to wrong zone!"));
 	}
 }
