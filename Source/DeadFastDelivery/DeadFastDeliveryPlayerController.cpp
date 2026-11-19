@@ -37,7 +37,15 @@ void ADeadFastDeliveryPlayerController::BeginPlay()
 			UE_LOG(LogDeadFastDelivery, Error, TEXT("Could not spawn mobile controls widget."));
 
 		}
-
+		// change mapping context -- incomplete
+		// if (ULocalPlayer* LP = GetLocalPlayer())
+		// {
+		// 	if (auto* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		// 	{
+		// 		Subsystem->RemoveMappingContext(DefaultMappingContexts);
+		// 		Subsystem->AddMappingContext(LevelIMC, 0);
+		// 	}
+		// }
 	}
 }
 

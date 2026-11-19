@@ -29,29 +29,18 @@ public:
 
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = "Hands")
 	TObjectPtr<USphereComponent> RightHand;
-	
-	// used for rotation
-	// UPROPERTY() USceneComponent* RightPivot;
-	// UPROPERTY() USceneComponent* LeftPivot;
 
 	// HandsComponent.h
 	FRotator LeftHandRot = FRotator::ZeroRotator;
 	FRotator RightHandRot = FRotator::ZeroRotator;
 	FVector LeftPivotLoc = FVector(0, -20, 0); // pivot in view space, relative to pawn view location
 	FVector RightPivotLoc = FVector(0, 20, 0);
-	FVector HandOffset = FVector(150, 0, 0); // rest offset from the pivot
+	FVector HandOffset = FVector(200, 0, 0); // rest offset from the pivot
 
 	void SetHandRotation(int HandOption, const FRotator& Rot);
-	
-	UPROPERTY(EditAnywhere, Category="Hands|Physics") float HandMassKg = 50.f;
-	UPROPERTY(EditAnywhere, Category="Hands|Physics") float HandStiffness = 400.f;
-	UPROPERTY(EditAnywhere, Category="Hands|Physics") float HandDamping = 40.f;
-	UPROPERTY(EditAnywhere, Category="Hands|Physics") float HandMaxAccel = 20000.f;
-	UPROPERTY(EditAnywhere, Category="Hands|Physics") float MaxHandLag = 100.f;
-	UPROPERTY(EditAnywhere, Category="Hands") float MaxHandStep = 12.f;
 
 private:
-	USphereComponent* CreateHand(const FName Name);
+	USphereComponent* CreateHand(const FName Name, const FVector& HandRelativeLocation);
 
 	FVector LeftHandRelativeLocation = FVector(150.f, 40.f, -10.f);
 	FVector RightHandRelativeLocation = FVector(150.f,-40.f, -10.f);
