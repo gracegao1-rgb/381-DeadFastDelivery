@@ -2,6 +2,7 @@
 
 
 #include "HandsComponent.h"
+#include "Engine/OverlapResult.h"
 
 UHandsComponent::UHandsComponent()
 {
@@ -17,7 +18,8 @@ void UHandsComponent::BeginPlay()
 	{
 		HandOffset = FVector(100.f, 0.f, 0.f);
 	}
-
+	
+	// Create Hands
 	if (!LeftHand)
 	{
 		LeftHand  = CreateHand(TEXT("LeftHand"),  LeftHandRelativeLocation);
@@ -25,6 +27,16 @@ void UHandsComponent::BeginPlay()
 	if (!RightHand)
 	{
 		RightHand = CreateHand(TEXT("RightHand"), RightHandRelativeLocation);
+	}
+	
+	// Create Handles
+	if (!LeftHandle)
+	{
+		LeftHandle  = CreateHandle();
+	}
+	if (!RightHandle)
+	{
+		RightHandle = CreateHandle();
 	}
 }
 
@@ -92,6 +104,16 @@ void UHandsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		RightHand->SetWorldLocation(DesiredLocRight, true);
 		RightHand->SetWorldRotation(ViewQuat * RightHandRot.Quaternion(), false);
 	}
+	
+	// Match handle location to hands
+	if (LeftHandle && LeftHandle->GetGrabbedComponent() && LeftHand)
+	{
+		LeftHandle->SetTargetLocationAndRotation(LeftHand->GetComponentLocation(), LeftHand->GetComponentRotation());
+	}
+	if (RightHandle && RightHandle->GetGrabbedComponent() && RightHand)
+	{
+		RightHandle->SetTargetLocationAndRotation(RightHand->GetComponentLocation(), RightHand->GetComponentRotation());
+	}
 }
 
 void UHandsComponent::SetHandRotation(int HandOption, const FRotator& Rot)
@@ -105,5 +127,114 @@ void UHandsComponent::SetHandRotation(int HandOption, const FRotator& Rot)
 	{
 		// left hand
 		LeftHandRot = Rot;
+	}
+}
+
+// Helper method to create each physics handle
+UPhysicsHandleComponent* UHandsComponent::CreateHandle() const
+{
+	AActor* Owner = GetOwner();
+	if (!Owner)
+		return nullptr;
+
+	UPhysicsHandleComponent* Handle = NewObject<UPhysicsHandleComponent>(Owner);
+	Handle->bSoftAngularConstraint = true;
+	Handle->bSoftLinearConstraint = true;
+	Handle->bInterpolateTarget = true;
+	Handle->LinearStiffness = 750.f;
+	Handle->LinearDamping = 200.f;
+	Handle->AngularStiffness = 1500.f;
+	Handle->AngularDamping = 500.f;
+	Handle->InterpolationSpeed = 50.f;
+	Handle->RegisterComponent();
+	return Handle;
+}
+
+void UHandsComponent::StartGrabbing()
+{
+	TryGrabbing(LeftHand,  LeftHandle);
+	TryGrabbing(RightHand, RightHandle);
+	
+	GEngine->AddOnScreenDebugMessage(
+			-1,
+			2.0f,
+			FColor::Blue, 
+			TEXT("Trying to grab")        
+		);
+}
+
+void UHandsComponent::StopGrabbing()
+{
+	if (LeftHandle)
+	{
+		LeftHandle->ReleaseComponent();
+	}
+	if (RightHandle)
+	{
+		RightHandle->ReleaseComponent();
+	}
+	
+	GEngine->AddOnScreenDebugMessage(
+			-1,
+			2.0f,
+			FColor::Blue, 
+			TEXT("Stopped Grabbing")        
+		);
+}
+
+void UHandsComponent::TryGrabbing(USphereComponent* Hand, UPhysicsHandleComponent* Handle)
+{
+	if (!Hand || !Handle || Handle->GetGrabbedComponent())
+		return;
+
+	FCollisionObjectQueryParams ObjParams;
+	ObjParams.AddObjectTypesToQuery(ECC_PhysicsBody);
+	ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(HandGrab), false, GetOwner());
+
+	const FVector Center = Hand->GetComponentLocation();
+	const float Reach = Hand->GetScaledSphereRadius() * 1.5f;
+
+	TArray<FOverlapResult> Overlaps;
+	GetWorld()->OverlapMultiByObjectType(Overlaps, Center, FQuat::Identity,
+		ObjParams, FCollisionShape::MakeSphere(Reach), Params);
+
+	UPrimitiveComponent* Best = nullptr;
+	float BestDistSq = TNumericLimits<float>::Max();
+
+	// filter for closest object
+	for (const FOverlapResult& R : Overlaps)
+	{
+		UPrimitiveComponent* Comp = R.GetComponent();
+		if (!Comp || !Comp->IsSimulatingPhysics())
+			continue;
+
+		const float DistSq = FVector::DistSquared(Center, Comp->GetComponentLocation());
+		if (DistSq < BestDistSq)
+		{
+			BestDistSq = DistSq; 
+			Best = Comp;
+		}
+	}
+	
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		2.0f,
+		FColor::Blue, 
+		FString::Printf(TEXT("Overlap array length: %d"), Overlaps.Num())
+	);
+
+	if (Best)
+	{
+		Handle->GrabComponentAtLocationWithRotation(
+			Best, NAME_None, Best->GetComponentLocation(), Best->GetComponentRotation());
+		
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			2.0f,
+			FColor::Blue, 
+			TEXT("Found an object to grab")        
+		);
 	}
 }

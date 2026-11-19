@@ -83,6 +83,8 @@ protected:
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	
+	UPROPERTY(EditAnywhere, Category="Input") UInputAction* GrabAction;
+	
 	// for arm rotation
 	UPROPERTY(EditAnywhere, Category="Input") UInputAction* HandRotateAction;
 	UPROPERTY(EditAnywhere, Category="Input") UInputAction* HandScrollAction;

@@ -72,6 +72,10 @@ void ADeadFastDeliveryCharacter::SetupPlayerInputComponent(UInputComponent* Play
 		
 		// toggle/switch arm
 		EnhancedInputComponent->BindAction(ToggleHandAction, ETriggerEvent::Started, this, &ADeadFastDeliveryCharacter::ToggleHand);
+		
+		// Grab object
+		EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Started, HandsComponent, &UHandsComponent::StartGrabbing);
+		EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Completed, HandsComponent, &UHandsComponent::StopGrabbing);
 	}
 	else
 	{

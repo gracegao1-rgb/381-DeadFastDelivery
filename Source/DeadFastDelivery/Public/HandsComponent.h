@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
 #include "Components/SphereComponent.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "HandsComponent.generated.h"
 
 
@@ -14,6 +15,12 @@ class DEADFASTDELIVERY_API UHandsComponent : public USceneComponent
 	GENERATED_BODY()
 
 public:	
+	virtual void BeginPlay() override;
+	
+	void StartGrabbing();
+	
+	void StopGrabbing();
+	
 	UHandsComponent();
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -22,13 +29,18 @@ public:
 	FVector RightHandRelativeOffset = FVector(0.f,0.f, 0.f);
 
 // protected:
-	virtual void BeginPlay() override;
 	
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = "Hands")
 	TObjectPtr<USphereComponent> LeftHand;
 
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = "Hands")
 	TObjectPtr<USphereComponent> RightHand;
+	
+	UPROPERTY(Transient) 
+	TObjectPtr<UPhysicsHandleComponent> LeftHandle;
+	
+	UPROPERTY(Transient) 
+	TObjectPtr<UPhysicsHandleComponent> RightHandle;
 
 	// HandsComponent.h
 	FRotator LeftHandRot = FRotator::ZeroRotator;
@@ -41,6 +53,10 @@ public:
 
 private:
 	USphereComponent* CreateHand(const FName Name, const FVector& HandRelativeLocation);
+	
+	UPhysicsHandleComponent* CreateHandle() const;
+	
+	void TryGrabbing(USphereComponent* Hand, UPhysicsHandleComponent* Handle);
 
 	FVector LeftHandRelativeLocation = FVector(150.f, 40.f, -10.f);
 	FVector RightHandRelativeLocation = FVector(150.f,-40.f, -10.f);
