@@ -70,7 +70,7 @@ void UHandsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	{
 		if (!Hand) return;
 
-		const FVector Desired = Origin + ControlRot.RotateVector(Pivot + HandRot.RotateVector(HandOffset));
+		const FVector Desired = Origin + ControlRot.R	otateVector(Pivot + HandRot.RotateVector(HandOffset));
 		const FVector Current = Hand->GetComponentLocation();
 		const FVector Error = Desired - Current;
 

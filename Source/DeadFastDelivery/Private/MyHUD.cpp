@@ -16,17 +16,30 @@ AMyHUD::AMyHUD()
 	{
 		HUDWidgetClass = WidgetBPClass.Class;
 	}
+	
+	static ConstructorHelpers::FClassFinder<UHUDWidget> PauseWidgetBPClass(
+		TEXT("/Game/Blueprints/UI/WBP_PauseMenu"));
+	if (PauseWidgetBPClass.Succeeded())
+	{
+		PauseMenuWidgetClass = PauseWidgetBPClass.Class;
+	}
 }
 
 void AMyHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// adds widget blueprint to HUD UI
+	// creates and adds widget blueprint to HUD UI
 	if (HUDWidgetClass)
 	{
 		HUDWidget = CreateWidget<UHUDWidget>(GetOwningPlayerController(), HUDWidgetClass);
 		if (HUDWidget) HUDWidget->AddToViewport();
+	}
+	
+	// create pause menu widget, but doesn't add it
+	if (PauseMenuWidgetClass)
+	{
+		PauseMenuWidget = CreateWidget<UPauseMenuWidget>(GetOwningPlayerController(), PauseMenuWidgetClass);
 	}
 }
 
@@ -38,5 +51,17 @@ void AMyHUD::Tick(float DeltaSeconds)
 	if (const ADeadFastDeliveryGameMode* Gm = GetWorld()->GetAuthGameMode<ADeadFastDeliveryGameMode>())
 	{
 		HUDWidget->SetTimeRemaining(Gm->GetTimeRemaining());
+	}
+}
+
+void AMyHUD::TogglePauseMenu() const
+{
+	if (!bIsPaused)
+	{
+		PauseMenuWidget->AddToViewport(10);
+	}
+	else
+	{
+		PauseMenuWidget->RemoveFromParent();
 	}
 }
