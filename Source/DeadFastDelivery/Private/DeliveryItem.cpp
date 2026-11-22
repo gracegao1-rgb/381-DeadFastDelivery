@@ -3,7 +3,9 @@
 
 #include "DeliveryItem.h"
 
+#include "DeadFastDeliveryCharacter.h"
 #include "DeadFastDeliveryGameMode.h"
+#include "HandsComponent.h"
 
 // Sets default values
 ADeliveryItem::ADeliveryItem()
@@ -12,14 +14,6 @@ ADeliveryItem::ADeliveryItem()
 	
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DeliveryItemMesh"));
 	RootComponent = Mesh;
-	
-	// Setup physics
-	if (Mesh)
-	{
-		Mesh->SetMobility(EComponentMobility::Movable);
-		Mesh->SetSimulatePhysics(true);
-		Mesh->SetEnableGravity(true);
-	}
 	
 	// Get material assets
 	ConstructorHelpers::FObjectFinder<UMaterialInterface> MaterialAsset(TEXT("/Game/Materials/M_GlowingAura.M_GlowingAura"));
@@ -39,6 +33,16 @@ void ADeliveryItem::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// Setup physics
+	if (Mesh)
+	{
+		Mesh->SetMobility(EComponentMobility::Movable);
+		Mesh->SetSimulatePhysics(true);
+		Mesh->SetEnableGravity(true);
+		Mesh->OnComponentHit.AddDynamic(this, &ADeliveryItem::HandleHit);
+		Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		Mesh->SetNotifyRigidBodyCollision(true);
+	}
 }
 
 void ADeliveryItem::HandleStartZoneOverlap(int Zone)
@@ -77,6 +81,30 @@ void ADeliveryItem::HandleEndZoneOverlap()
 	if (ADeadFastDeliveryGameMode* Gm = GetWorld()->GetAuthGameMode<ADeadFastDeliveryGameMode>())
 	{
 		Gm->UpdateNumberOfDeliveredItems();
+	}
+}
+
+
+void ADeliveryItem::HandleHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	// Ignore hitting ourselves, our owner, or hands
+	if (OtherActor == this || OtherActor == GetOwner())
+	{
+		return;
+	}
+	if (OtherActor && (OtherActor->IsA<ADeadFastDeliveryCharacter>() || OtherActor->IsA<UHandsComponent>()))
+	{
+		return;
+	}
+	
+	UClass* ActorClass = OtherActor->GetClass();
+	float ImpactForce = NormalImpulse.Size()/Mesh->GetMass()/100; // Newton Seconds
+	if (ImpactForce > 1.0f)
+	{
+		Health -= ImpactForce;
+		
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green,FString::Printf(TEXT("Object hit! %s"), *ActorClass->GetName()));
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green,FString::Printf(TEXT("Health Remaining! %f"), Health));
 	}
 }
 

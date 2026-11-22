@@ -21,6 +21,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
+	UFUNCTION()
+	virtual void HandleHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> Mesh;
 	
@@ -33,6 +36,8 @@ protected:
 	// Delivery object's identifier should match the zone identifier
 	UPROPERTY(EditAnywhere, Category = "Tuning")
 	int ZoneIdentifier = 0;
+	
+	float Health = 100.f;
 
 public:	
 	// what happens when this object enters the delivery zone
