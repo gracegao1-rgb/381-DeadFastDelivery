@@ -6,6 +6,7 @@
 #include "InteractableLock.h"
 #include "MyHUD.h"
 #include "MyWorldSettings.h"
+#include "EnvironmentQuery/EnvQueryTypes.h"
 #include "Kismet/GameplayStatics.h"
 
 ADeadFastDeliveryGameMode::ADeadFastDeliveryGameMode()
@@ -118,4 +119,26 @@ void ADeadFastDeliveryGameMode::ReportLockReached()
 void ADeadFastDeliveryGameMode::TogglePause()
 {
 	bPaused = !bPaused;
+}
+
+// Max Cost represents total earnable
+void ADeadFastDeliveryGameMode::ReportMaxCost(float Cost)
+{
+	// called on level load -- all deliverables report cost to game mode
+	MaxScore += Cost;
+	
+	// game lost if score less than minimum passing
+	if (MaxScore < MinPassingScore && bGameStarted)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green,FString::Printf(TEXT("Level Fail: Too many broken deliverables")));
+	}
+}
+
+void ADeadFastDeliveryGameMode::ReportCost(float Cost)
+{
+	// add/subtract cost on entering/leaving delivery zone (+/- decided by caller)
+	TotalScore += Cost;
+	bGameStarted = true;
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green,FString::Printf(TEXT("Max Score: %d"), FMath::RoundToInt(MaxScore)));
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green,FString::Printf(TEXT("Current Score: %d"), FMath::RoundToInt(TotalScore)));
 }

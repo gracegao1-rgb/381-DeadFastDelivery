@@ -60,6 +60,12 @@ void ADeliveryItem::BeginPlay()
 		Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		Mesh->SetNotifyRigidBodyCollision(true);
 	}
+	
+	// report cost to game mode
+	if (ADeadFastDeliveryGameMode* Gm = GetWorld()->GetAuthGameMode<ADeadFastDeliveryGameMode>())
+	{
+		Gm->ReportMaxCost(Health*CostPerHealth);
+	}
 }
 
 void ADeliveryItem::HandleStartZoneOverlap(int Zone)
@@ -76,6 +82,7 @@ void ADeliveryItem::HandleStartZoneOverlap(int Zone)
 		if (ADeadFastDeliveryGameMode* Gm = GetWorld()->GetAuthGameMode<ADeadFastDeliveryGameMode>())
 		{
 			Gm->UpdateNumberOfDeliveredItems();
+			Gm->ReportCost(CostPerHealth*Health); // add total to score
 		}
 	}
 	else
@@ -90,14 +97,18 @@ void ADeliveryItem::HandleStartZoneOverlap(int Zone)
 
 void ADeliveryItem::HandleEndZoneOverlap()
 {
+	if (ADeadFastDeliveryGameMode* Gm = GetWorld()->GetAuthGameMode<ADeadFastDeliveryGameMode>())
+	{
+		Gm->UpdateNumberOfDeliveredItems();
+		if (bIsDelivered)
+		{
+			Gm->ReportCost(-CostPerHealth*Health);
+		}
+	}
 	bIsDelivered = false;
 	if (Mesh)
 	{
 		Mesh->SetOverlayMaterial(nullptr);
-	}
-	if (ADeadFastDeliveryGameMode* Gm = GetWorld()->GetAuthGameMode<ADeadFastDeliveryGameMode>())
-	{
-		Gm->UpdateNumberOfDeliveredItems();
 	}
 }
 
@@ -114,14 +125,31 @@ void ADeliveryItem::HandleHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 		return;
 	if (bIsBeingGrabbed) // don't apply damage when being grabbed
 		return;
+	if (bIsDestroyed)
+		return;
 	
 	UClass* ActorClass = OtherActor->GetClass();
 	float ImpactForce = NormalImpulse.Size()/Mesh->GetMass()/100; // Newton Seconds
 	if (ImpactForce > DamageThreshold)
 	{
-		Health -= ImpactForce;
+		const float HealthLost = FMath::Min(Health, ImpactForce);
+		Health -= HealthLost;
+
+		const float CostLost = HealthLost * CostPerHealth;
+		if (ADeadFastDeliveryGameMode* Gm = GetWorld()->GetAuthGameMode<ADeadFastDeliveryGameMode>())
+		{
+			Gm->ReportMaxCost(-CostLost);
+			if (bIsDelivered)
+			{
+				Gm->ReportCost(-CostLost);
+			}
+		}
+		
 		if (Health <= 0.0f)
+		{
+			bIsDestroyed = true;
 			HandleDestroy();
+		}
 		
 		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green,FString::Printf(TEXT("Object hit! %s"), *ActorClass->GetName()));
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green,FString::Printf(TEXT("Health Remaining! %f"), Health));

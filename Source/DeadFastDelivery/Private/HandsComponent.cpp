@@ -9,6 +9,12 @@
 UHandsComponent::UHandsComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	
+	// ArmMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArmMesh"));
+	// ArmMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//
+	// static ConstructorHelpers::FObjectFinder<UStaticMesh> Cyl(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
+	// if (Cyl.Succeeded()) ArmMesh->SetStaticMesh(Cyl.Object);
 }
 
 // Called when the game starts

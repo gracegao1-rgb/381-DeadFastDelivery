@@ -47,6 +47,9 @@ public:
 	
 	UPROPERTY(Transient) 
 	FTransform RightGrabOffset;
+	
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* ArmMesh;
 
 	// HandsComponent.h
 	FRotator LeftHandRot = FRotator::ZeroRotator;

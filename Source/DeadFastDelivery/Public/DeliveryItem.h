@@ -20,6 +20,8 @@ public:
 	bool bIsDelivered = false;
 	
 	bool bIsBeingGrabbed = false;
+	
+	bool bIsDestroyed = false;
 
 protected:
 	// Called when the game starts or when spawned
@@ -55,6 +57,10 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = "Tuning")
 	float DamageThreshold = 4.f;
+	
+	// scoring
+	UPROPERTY(EditAnywhere, Category = "Tuning")
+	int32 CostPerHealth = 10; // current value is Health * CostPerHealth
 
 public:	
 	// what happens when this object enters the delivery zone

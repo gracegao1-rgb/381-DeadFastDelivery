@@ -65,6 +65,24 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category = "Rules")
 	int32 GetKeysCollected() const { return KeysCollected; }
+	
+	UFUNCTION(BlueprintPure, Category = "Rules")
+	float GetCurrentScore() const { return TotalScore; }
+	
+	UFUNCTION(BlueprintPure, Category = "Rules")
+	float GetMaxScore() const { return MaxScore; }
+	
+	float MaxScore = 0; // maximum possible score -- changes as objects break
+	
+	float TotalScore = 0; // currently owned score
+	
+	float MinPassingScore = 200;
+	
+	void ReportMaxCost(float Cost);
+
+	void ReportCost(float Cost);
+	
+	bool bGameStarted = false;
 };
 
 
