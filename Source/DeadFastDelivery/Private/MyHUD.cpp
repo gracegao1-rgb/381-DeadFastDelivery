@@ -73,16 +73,33 @@ void AMyHUD::Tick(float DeltaSeconds)
 
 void AMyHUD::TogglePauseMenu()
 {
+	APlayerController* PC = GetOwningPlayerController();
+	if (!PC) return;
+	
 	if (!bIsPaused)
 	{
 		if (PauseMenuWidget)
 			PauseMenuWidget->SetVisibility(ESlateVisibility::Visible);
 		bIsPaused = true;
+		
+		FInputModeGameAndUI InputMode;
+		InputMode.SetWidgetToFocus(PauseMenuWidget->TakeWidget());
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+
+		PC->SetInputMode(InputMode);
+		PC->SetShowMouseCursor(true);
+		PC->SetIgnoreLookInput(true);
+		PC->SetPause(true);
 	}
 	else
 	{
 		if (PauseMenuWidget)
 			PauseMenuWidget->SetVisibility(ESlateVisibility::Hidden);
 		bIsPaused = false;
+		
+		PC->SetInputMode(FInputModeGameOnly());
+		PC->SetShowMouseCursor(false);
+		PC->SetIgnoreLookInput(false);
+		PC->SetPause(false);
 	}
 }

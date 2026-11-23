@@ -28,8 +28,6 @@ public:
 	void UpdateNumberOfDeliveredItems();
 	
 	void IncrementNumberOfDestroyedItems();
-
-	void TogglePause();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -48,8 +46,6 @@ protected:
 	int32 NumberOfDeliveredItems = 0;
 	
 	int32 NumberOfDestroyedItems = 0;
-	
-	bool bPaused = false;
 	
 	// keys
 	UPROPERTY(BlueprintReadOnly, Category = "Rules")

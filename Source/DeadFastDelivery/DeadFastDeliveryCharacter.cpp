@@ -218,11 +218,6 @@ void ADeadFastDeliveryCharacter::TogglePause()
 			}
 		}
 	}
-	
-	if (ADeadFastDeliveryGameMode* GameMode = Cast<ADeadFastDeliveryGameMode>(UGameplayStatics::GetGameMode(this)))
-	{
-		GameMode->TogglePause();
-	}
 }
 
 void ADeadFastDeliveryCharacter::ToggleDrift()

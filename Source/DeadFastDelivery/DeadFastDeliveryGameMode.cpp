@@ -6,7 +6,6 @@
 #include "InteractableLock.h"
 #include "MyHUD.h"
 #include "MyWorldSettings.h"
-#include "EnvironmentQuery/EnvQueryTypes.h"
 #include "Kismet/GameplayStatics.h"
 
 ADeadFastDeliveryGameMode::ADeadFastDeliveryGameMode()
@@ -39,7 +38,7 @@ void ADeadFastDeliveryGameMode::BeginPlay()
 
 void ADeadFastDeliveryGameMode::UpdateCountdown()
 {
-	if (LevelSeconds > 0.0f && !bPaused)
+	if (LevelSeconds > 0.0f)
 	{
 		LevelSeconds -= 1;
 	}
@@ -114,11 +113,6 @@ void ADeadFastDeliveryGameMode::ReportLockReached()
 			Lock->Unlock();
 		}
 	}
-}
-
-void ADeadFastDeliveryGameMode::TogglePause()
-{
-	bPaused = !bPaused;
 }
 
 // Max Cost represents total earnable
