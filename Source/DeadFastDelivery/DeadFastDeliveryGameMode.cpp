@@ -3,6 +3,7 @@
 #include "DeadFastDeliveryGameMode.h"
 
 #include "DeliveryItem.h"
+#include "InteractableLock.h"
 #include "MyHUD.h"
 #include "MyWorldSettings.h"
 #include "Kismet/GameplayStatics.h"
@@ -94,6 +95,24 @@ void ADeadFastDeliveryGameMode::UpdateNumberOfDeliveredItems()
 void ADeadFastDeliveryGameMode::IncrementNumberOfDestroyedItems()
 {
 	NumberOfDestroyedItems++;
+}
+
+/** A key was picked up. The key itself does not know what that means. */
+void ADeadFastDeliveryGameMode::ReportKeyCollected()
+{
+	KeysCollected++;
+}
+
+void ADeadFastDeliveryGameMode::ReportLockReached()
+{
+	if (GetKeysCollected() >= 1)
+	{
+		// open/destroy the lock
+		if (AInteractableLock* Lock = Cast<AInteractableLock>(UGameplayStatics::GetActorOfClass(this, AInteractableLock::StaticClass())))
+		{
+			Lock->Unlock();
+		}
+	}
 }
 
 void ADeadFastDeliveryGameMode::TogglePause()

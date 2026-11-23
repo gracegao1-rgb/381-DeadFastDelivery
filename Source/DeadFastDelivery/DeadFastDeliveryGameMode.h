@@ -50,6 +50,21 @@ protected:
 	int32 NumberOfDestroyedItems = 0;
 	
 	bool bPaused = false;
+	
+	// keys
+	UPROPERTY(BlueprintReadOnly, Category = "Rules")
+	int32 KeysCollected = 0;
+	
+public:
+	/** A key was picked up. The key itself does not know what that means. */
+	UFUNCTION(BlueprintCallable, Category = "Rules")
+	void ReportKeyCollected();
+	
+	UFUNCTION(BlueprintCallable, Category = "Rules")
+	void ReportLockReached();
+	
+	UFUNCTION(BlueprintPure, Category = "Rules")
+	int32 GetKeysCollected() const { return KeysCollected; }
 };
 
 
