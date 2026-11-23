@@ -14,3 +14,12 @@ void UHUDWidget::SetDeliveredItems(int32 DeliveredItems, int32 TotalNumberOfItem
 {
 	DeliveredText->SetText(FText::FromString(FString::Printf(TEXT("%d/%d Delivered"), DeliveredItems, TotalNumberOfItems)));
 }
+
+
+void UHUDWidget::SetDestroyedItems(int32 DestroyedItems) const
+{
+	if (DestroyedItems > 0)
+		DestroyedText->SetText(FText::FromString(FString::Printf(TEXT("%d Destroyed"), DestroyedItems)));
+	else
+		DestroyedText->SetText(FText::FromString(FString::Printf(TEXT(""))));
+}

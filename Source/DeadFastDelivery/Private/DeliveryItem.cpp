@@ -6,6 +6,7 @@
 #include "DeadFastDeliveryCharacter.h"
 #include "DeadFastDeliveryGameMode.h"
 #include "HandsComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ADeliveryItem::ADeliveryItem()
@@ -100,7 +101,7 @@ void ADeliveryItem::HandleHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 	
 	UClass* ActorClass = OtherActor->GetClass();
 	float ImpactForce = NormalImpulse.Size()/Mesh->GetMass()/100; // Newton Seconds
-	if (ImpactForce > 5.0f)
+	if (ImpactForce > DamageThreshold)
 	{
 		Health -= ImpactForce;
 		if (Health <= 0.0f)
@@ -113,6 +114,10 @@ void ADeliveryItem::HandleHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 
 void ADeliveryItem::HandleDestroy()
 {
+	if (ADeadFastDeliveryGameMode* GameMode = Cast<ADeadFastDeliveryGameMode>(UGameplayStatics::GetGameMode(this)))
+	{
+		GameMode->IncrementNumberOfDestroyedItems();
+	}
 	Destroy();
 }
 

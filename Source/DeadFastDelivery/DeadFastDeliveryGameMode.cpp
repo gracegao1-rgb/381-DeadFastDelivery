@@ -69,6 +69,11 @@ int32 ADeadFastDeliveryGameMode::GetNumberOfDeliveredItems() const
 	return NumberOfDeliveredItems;
 }
 
+int32 ADeadFastDeliveryGameMode::GetNumberOfDestroyedItems() const
+{
+	return NumberOfDestroyedItems;
+}
+
 void ADeadFastDeliveryGameMode::UpdateNumberOfDeliveredItems()
 {
 	TArray<AActor*> FoundActors;
@@ -84,4 +89,9 @@ void ADeadFastDeliveryGameMode::UpdateNumberOfDeliveredItems()
 		}
 	}
 	NumberOfDeliveredItems = Count;
+}
+
+void ADeadFastDeliveryGameMode::IncrementNumberOfDestroyedItems()
+{
+	NumberOfDestroyedItems++;
 }

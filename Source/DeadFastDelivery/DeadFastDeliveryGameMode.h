@@ -23,7 +23,11 @@ public:
 	
 	int32 GetNumberOfDeliveredItems() const;
 	
+	int32 GetNumberOfDestroyedItems() const;
+	
 	void UpdateNumberOfDeliveredItems();
+	
+	void IncrementNumberOfDestroyedItems();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -40,6 +44,8 @@ protected:
 	int32 TotalNumberOfItems = 0;
 	
 	int32 NumberOfDeliveredItems = 0;
+	
+	int32 NumberOfDestroyedItems = 0;
 };
 
 

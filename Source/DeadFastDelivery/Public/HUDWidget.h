@@ -17,9 +17,11 @@ class DEADFASTDELIVERY_API UHUDWidget : public UUserWidget
 public:
 	void SetTimeRemaining(int32 Seconds) const;
 	void SetDeliveredItems(int32 DeliveredItems, int32 TotalNumberOfItems) const;
+	void SetDestroyedItems(int32 DestroyedItems) const;
 	
 protected:
 	UPROPERTY(meta = (BindWidget)) UTextBlock* TimeText;
 	UPROPERTY(meta = (BindWidget)) UTextBlock* DeliveredText;
+	UPROPERTY(meta = (BindWidget)) UTextBlock* DestroyedText;
 	
 };

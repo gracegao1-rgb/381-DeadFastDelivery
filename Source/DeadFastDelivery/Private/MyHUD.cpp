@@ -53,6 +53,7 @@ void AMyHUD::Tick(float DeltaSeconds)
 	{
 		HUDWidget->SetTimeRemaining(Gm->GetTimeRemaining());
 		HUDWidget->SetDeliveredItems(Gm->GetNumberOfDeliveredItems(), Gm->GetTotalNumberOfItems());
+		HUDWidget->SetDestroyedItems(Gm->GetNumberOfDestroyedItems());
 	}
 }
 

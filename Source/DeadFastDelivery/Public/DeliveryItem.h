@@ -46,7 +46,10 @@ protected:
 	bool HasDurability = false;
 	
 	UPROPERTY(EditAnywhere, Category = "Tuning")
-	float Health = 20.f;	
+	float Health = 20.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Tuning")
+	float DamageThreshold = 4.f;
 
 public:	
 	// what happens when this object enters the delivery zone
