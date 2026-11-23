@@ -37,7 +37,7 @@ void ADeadFastDeliveryGameMode::BeginPlay()
 
 void ADeadFastDeliveryGameMode::UpdateCountdown()
 {
-	if (LevelSeconds > 0.0f)
+	if (LevelSeconds > 0.0f && !bPaused)
 	{
 		LevelSeconds -= 1;
 	}
@@ -94,4 +94,9 @@ void ADeadFastDeliveryGameMode::UpdateNumberOfDeliveredItems()
 void ADeadFastDeliveryGameMode::IncrementNumberOfDestroyedItems()
 {
 	NumberOfDestroyedItems++;
+}
+
+void ADeadFastDeliveryGameMode::TogglePause()
+{
+	bPaused = !bPaused;
 }

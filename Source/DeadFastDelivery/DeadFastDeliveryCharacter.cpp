@@ -9,7 +9,9 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DeadFastDelivery.h"
+#include "DeadFastDeliveryGameMode.h"
 #include "MyHUD.h"
+#include "Kismet/GameplayStatics.h"
 
 ADeadFastDeliveryCharacter::ADeadFastDeliveryCharacter()
 {
@@ -215,6 +217,11 @@ void ADeadFastDeliveryCharacter::TogglePause()
 				MyHUD->TogglePauseMenu();
 			}
 		}
+	}
+	
+	if (ADeadFastDeliveryGameMode* GameMode = Cast<ADeadFastDeliveryGameMode>(UGameplayStatics::GetGameMode(this)))
+	{
+		GameMode->TogglePause();
 	}
 }
 

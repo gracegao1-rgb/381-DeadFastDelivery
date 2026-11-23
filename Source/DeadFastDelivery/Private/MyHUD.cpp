@@ -17,8 +17,8 @@ AMyHUD::AMyHUD()
 		HUDWidgetClass = WidgetBPClass.Class;
 	}
 	
-	static ConstructorHelpers::FClassFinder<UHUDWidget> PauseWidgetBPClass(
-		TEXT("/Game/Blueprints/UI/WBP_PauseMenu"));
+	static ConstructorHelpers::FClassFinder<UPauseMenuWidget> PauseWidgetBPClass(
+	TEXT("/Game/Blueprints/UI/WBP_PauseMenu"));
 	if (PauseWidgetBPClass.Succeeded())
 	{
 		PauseMenuWidgetClass = PauseWidgetBPClass.Class;
@@ -40,7 +40,11 @@ void AMyHUD::BeginPlay()
 	if (PauseMenuWidgetClass)
 	{
 		PauseMenuWidget = CreateWidget<UPauseMenuWidget>(GetOwningPlayerController(), PauseMenuWidgetClass);
-		if (PauseMenuWidget) PauseMenuWidget->AddToViewport(10);
+		if (PauseMenuWidget)
+		{
+			PauseMenuWidget->AddToViewport(10);
+			PauseMenuWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 }
 
@@ -57,16 +61,18 @@ void AMyHUD::Tick(float DeltaSeconds)
 	}
 }
 
-void AMyHUD::TogglePauseMenu() const
+void AMyHUD::TogglePauseMenu()
 {
 	if (!bIsPaused)
 	{
 		if (PauseMenuWidget)
 			PauseMenuWidget->SetVisibility(ESlateVisibility::Visible);
+		bIsPaused = true;
 	}
 	else
 	{
 		if (PauseMenuWidget)
 			PauseMenuWidget->SetVisibility(ESlateVisibility::Hidden);
+		bIsPaused = false;
 	}
 }

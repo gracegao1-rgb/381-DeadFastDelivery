@@ -21,7 +21,7 @@ public:
 	
 	virtual void Tick(float DeltaSeconds) override;
 	
-	void TogglePauseMenu() const;
+	void TogglePauseMenu();
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UHUDWidget> HUDWidgetClass;
