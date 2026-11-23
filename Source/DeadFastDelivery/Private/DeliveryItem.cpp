@@ -6,6 +6,8 @@
 #include "DeadFastDeliveryCharacter.h"
 #include "DeadFastDeliveryGameMode.h"
 #include "HandsComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -26,6 +28,20 @@ ADeliveryItem::ADeliveryItem()
 	if (MaterialAsset2.Succeeded())
 	{
 		RedGlowMaterial = MaterialAsset2.Object;
+	}
+	
+	// Get effect
+	ExplosionEffect = CreateDefaultSubobject<UNiagaraComponent>("ExplosionEffect");
+	ExplosionEffect->SetupAttachment(Mesh);
+	ExplosionEffect->bAutoActivate = false;
+	
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSystemAsset(
+		TEXT("/Game/Particles/NS_Confetti.NS_Confetti")
+	);
+	
+	if (NiagaraSystemAsset.Succeeded())
+	{
+		ExplosionEffect->SetAsset(NiagaraSystemAsset.Object);
 	}
 }
 
@@ -118,6 +134,10 @@ void ADeliveryItem::HandleDestroy()
 	{
 		GameMode->IncrementNumberOfDestroyedItems();
 	}
-	Destroy();
+	
+	Mesh->SetVisibility(false);
+	ExplosionEffect->Activate();
+	
+	SetLifeSpan(3.0f);
 }
 

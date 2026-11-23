@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "DeliveryItem.generated.h"
 
+class UNiagaraComponent;
+
 UCLASS()
 class DEADFASTDELIVERY_API ADeliveryItem : public AActor
 {
@@ -37,6 +39,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Materials")
 	class UMaterialInterface* RedGlowMaterial;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UNiagaraComponent> ExplosionEffect;
 	
 	// Delivery object's identifier should match the zone identifier
 	UPROPERTY(EditAnywhere, Category = "Tuning")
