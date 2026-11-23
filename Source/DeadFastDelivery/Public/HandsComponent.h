@@ -27,6 +27,9 @@ public:
 	
 	FVector LeftHandRelativeOffset = FVector(0.f, 0.f, 0.f);
 	FVector RightHandRelativeOffset = FVector(0.f,0.f, 0.f);
+	
+	float GetLeftHandGrip() const {return LeftHandGrip;};
+	float GetRightHandGrip() const {return RightHandGrip;};
 
 // protected:
 	
@@ -66,7 +69,13 @@ private:
 	UPhysicsHandleComponent* CreateHandle() const;
 	
 	void TryGrabbing(USphereComponent* Hand, UPhysicsHandleComponent* Handle, FTransform& OutGrabOffset);
+	
+	// Called in tick
+	void UpdateGrip(UPhysicsHandleComponent* Handle, float& Grip, float DeltaTime);
 
-	FVector LeftHandRelativeLocation = FVector(150.f, 40.f, -10.f);
-	FVector RightHandRelativeLocation = FVector(150.f,-40.f, -10.f);
+	FVector LeftHandRelativeLocation = FVector(150.f, -40.f, -10.f);
+	FVector RightHandRelativeLocation = FVector(150.f,40.f, -10.f);
+	
+	float LeftHandGrip = 1.f; // [0,1]
+	float RightHandGrip = 1.f; // [0,1]
 };

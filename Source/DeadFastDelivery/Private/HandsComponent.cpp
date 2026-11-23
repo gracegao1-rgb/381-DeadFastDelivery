@@ -4,17 +4,13 @@
 #include "HandsComponent.h"
 
 #include "DeliveryItem.h"
+#include "NiagaraTypes.h"
 #include "Engine/OverlapResult.h"
 
 UHandsComponent::UHandsComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	
-	// ArmMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArmMesh"));
-	// ArmMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//
-	// static ConstructorHelpers::FObjectFinder<UStaticMesh> Cyl(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
-	// if (Cyl.Succeeded()) ArmMesh->SetStaticMesh(Cyl.Object);
 }
 
 // Called when the game starts
@@ -127,6 +123,34 @@ void UHandsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		HandTransform.SetScale3D(FVector::OneVector);
 		const FTransform Target = RightGrabOffset * HandTransform;
 		RightHandle->SetTargetLocationAndRotation(Target.GetLocation(), Target.Rotator());
+	}
+	
+	UpdateGrip(LeftHandle, LeftHandGrip, DeltaTime);
+	UpdateGrip(RightHandle, RightHandGrip, DeltaTime);
+}
+
+void UHandsComponent::UpdateGrip(UPhysicsHandleComponent* Handle, float& Grip, float DeltaTime)
+{
+	if (!Handle)
+		return;
+	
+	// Decrease grip when grabbing object
+	if (UMeshComponent* MeshComp = Cast<UMeshComponent>(Handle->GetGrabbedComponent()))
+	{
+		float Mass = MeshComp->GetMass();
+		
+		Grip -= 0.25 * DeltaTime;
+		
+		if (Grip < 0.f)
+			Grip = 0.f;
+	}
+	// Replenish grip when not grabbing object
+	else
+	{
+		Grip += 0.50 * DeltaTime;
+		
+		if (Grip > 1.f)
+			Grip = 1.f;
 	}
 }
 

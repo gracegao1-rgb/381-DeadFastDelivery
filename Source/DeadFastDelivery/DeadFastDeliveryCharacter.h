@@ -141,12 +141,14 @@ protected:
 	void ToggleDrift();
 
 public:
-
 	/** Returns the first person mesh **/
 	USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
 
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-
+	
+	
+	float GetLeftHandGrip() const {return HandsComponent->GetLeftHandGrip();}
+	float GetRightHandGrip() const {return HandsComponent->GetRightHandGrip();}
 };
 

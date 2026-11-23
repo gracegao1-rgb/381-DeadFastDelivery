@@ -3,6 +3,7 @@
 
 #include "MyHUD.h"
 
+#include "DeadFastDeliveryCharacter.h"
 #include "DeadFastDeliveryGameMode.h"
 
 AMyHUD::AMyHUD()
@@ -58,6 +59,15 @@ void AMyHUD::Tick(float DeltaSeconds)
 		HUDWidget->SetTimeRemaining(Gm->GetTimeRemaining());
 		HUDWidget->SetDeliveredItems(Gm->GetNumberOfDeliveredItems(), Gm->GetTotalNumberOfItems());
 		HUDWidget->SetDestroyedItems(Gm->GetNumberOfDestroyedItems());
+	}
+	
+	if (APlayerController* PC = GetOwningPlayerController())
+	{
+		if (ADeadFastDeliveryCharacter* Character = Cast<ADeadFastDeliveryCharacter>(PC->GetPawn()))
+		{
+			HUDWidget->SetLeftGripBar(Character->GetLeftHandGrip());
+			HUDWidget->SetRightGripBar(Character->GetRightHandGrip());
+		}
 	}
 }
 

@@ -23,3 +23,14 @@ void UHUDWidget::SetDestroyedItems(int32 DestroyedItems) const
 	else
 		DestroyedText->SetText(FText::FromString(FString::Printf(TEXT(""))));
 }
+
+
+void UHUDWidget::SetLeftGripBar(float LeftHandGrip) const
+{
+	LeftGripBar->SetPercent(LeftHandGrip);
+}
+
+void UHUDWidget::SetRightGripBar(float RightHandGrip) const
+{
+	RightGripBar->SetPercent(RightHandGrip);
+}
