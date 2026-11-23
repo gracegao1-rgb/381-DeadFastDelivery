@@ -41,6 +41,12 @@ public:
 	
 	UPROPERTY(Transient) 
 	TObjectPtr<UPhysicsHandleComponent> RightHandle;
+	
+	UPROPERTY(Transient) 
+	FTransform LeftGrabOffset;
+	
+	UPROPERTY(Transient) 
+	FTransform RightGrabOffset;
 
 	// HandsComponent.h
 	FRotator LeftHandRot = FRotator::ZeroRotator;
@@ -56,7 +62,7 @@ private:
 	
 	UPhysicsHandleComponent* CreateHandle() const;
 	
-	void TryGrabbing(USphereComponent* Hand, UPhysicsHandleComponent* Handle);
+	void TryGrabbing(USphereComponent* Hand, UPhysicsHandleComponent* Handle, FTransform& OutGrabOffset);
 
 	FVector LeftHandRelativeLocation = FVector(150.f, 40.f, -10.f);
 	FVector RightHandRelativeLocation = FVector(150.f,-40.f, -10.f);

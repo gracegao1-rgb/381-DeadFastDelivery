@@ -105,14 +105,20 @@ void UHandsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		RightHand->SetWorldRotation(ViewQuat * RightHandRot.Quaternion(), false);
 	}
 	
-	// Match handle location to hands
+	// Set location of grabbed object to hands with offset 
 	if (LeftHandle && LeftHandle->GetGrabbedComponent() && LeftHand)
 	{
-		LeftHandle->SetTargetLocationAndRotation(LeftHand->GetComponentLocation(), LeftHand->GetComponentRotation());
+		FTransform HandTransform = LeftHand->GetComponentTransform();
+		HandTransform.SetScale3D(FVector::OneVector);
+		const FTransform Target = LeftGrabOffset * HandTransform; // the side of the object, rather than its center
+		LeftHandle->SetTargetLocationAndRotation(Target.GetLocation(), Target.Rotator());
 	}
 	if (RightHandle && RightHandle->GetGrabbedComponent() && RightHand)
 	{
-		RightHandle->SetTargetLocationAndRotation(RightHand->GetComponentLocation(), RightHand->GetComponentRotation());
+		FTransform HandTransform = RightHand->GetComponentTransform();
+		HandTransform.SetScale3D(FVector::OneVector);
+		const FTransform Target = RightGrabOffset * HandTransform;
+		RightHandle->SetTargetLocationAndRotation(Target.GetLocation(), Target.Rotator());
 	}
 }
 
@@ -152,8 +158,8 @@ UPhysicsHandleComponent* UHandsComponent::CreateHandle() const
 
 void UHandsComponent::StartGrabbing()
 {
-	TryGrabbing(LeftHand,  LeftHandle);
-	TryGrabbing(RightHand, RightHandle);
+	TryGrabbing(LeftHand, LeftHandle, LeftGrabOffset);
+	TryGrabbing(RightHand, RightHandle, RightGrabOffset);
 	
 	GEngine->AddOnScreenDebugMessage(
 			-1,
@@ -174,6 +180,9 @@ void UHandsComponent::StopGrabbing()
 		RightHandle->ReleaseComponent();
 	}
 	
+	LeftHand->SetCollisionProfileName(TEXT("BlockAll"));
+	RightHand->SetCollisionProfileName(TEXT("BlockAll"));
+	
 	GEngine->AddOnScreenDebugMessage(
 			-1,
 			2.0f,
@@ -182,7 +191,7 @@ void UHandsComponent::StopGrabbing()
 		);
 }
 
-void UHandsComponent::TryGrabbing(USphereComponent* Hand, UPhysicsHandleComponent* Handle)
+void UHandsComponent::TryGrabbing(USphereComponent* Hand, UPhysicsHandleComponent* Handle, FTransform& OutGrabOffset)
 {
 	if (!Hand || !Handle || Handle->GetGrabbedComponent())
 		return;
@@ -227,8 +236,17 @@ void UHandsComponent::TryGrabbing(USphereComponent* Hand, UPhysicsHandleComponen
 
 	if (Best)
 	{
-		Handle->GrabComponentAtLocationWithRotation(
-			Best, NAME_None, Best->GetComponentLocation(), Best->GetComponentRotation());
+		FTransform HandTransform = Hand->GetComponentTransform();
+		FTransform BestObjectTransform  = Best->GetComponentTransform();
+		HandTransform.SetScale3D(FVector::OneVector);
+		BestObjectTransform.SetScale3D(FVector::OneVector);
+		
+		// the current position of the hand, relative to the object getting grabbed
+		OutGrabOffset = BestObjectTransform.GetRelativeTransform(HandTransform);
+		
+		Handle->GrabComponentAtLocationWithRotation(Best, NAME_None, BestObjectTransform.GetLocation(), BestObjectTransform.Rotator());
+		
+		Hand->SetCollisionProfileName(TEXT("NoCollision"));
 		
 		GEngine->AddOnScreenDebugMessage(
 			-1,
