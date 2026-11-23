@@ -125,11 +125,11 @@ void UHandsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		RightHandle->SetTargetLocationAndRotation(Target.GetLocation(), Target.Rotator());
 	}
 	
-	UpdateGrip(LeftHandle, LeftHandGrip, DeltaTime);
-	UpdateGrip(RightHandle, RightHandGrip, DeltaTime);
+	UpdateGrip(LeftHandle, RightHandle, LeftHandGrip, DeltaTime);
+	UpdateGrip(RightHandle, LeftHandle, RightHandGrip, DeltaTime);
 }
 
-void UHandsComponent::UpdateGrip(UPhysicsHandleComponent* Handle, float& Grip, float DeltaTime)
+void UHandsComponent::UpdateGrip(UPhysicsHandleComponent* Handle, UPhysicsHandleComponent* OtherHandle, float& Grip, float DeltaTime)
 {
 	if (!Handle)
 		return;
@@ -138,8 +138,16 @@ void UHandsComponent::UpdateGrip(UPhysicsHandleComponent* Handle, float& Grip, f
 	if (UMeshComponent* MeshComp = Cast<UMeshComponent>(Handle->GetGrabbedComponent()))
 	{
 		float Mass = MeshComp->GetMass();
+		float Modifier = 1.f;
 		
-		Grip -= 0.25 * DeltaTime;
+		if (OtherHandle && OtherHandle->GetGrabbedComponent())
+		{
+			UMeshComponent* OtherMeshComp = Cast<UMeshComponent>(Handle->GetGrabbedComponent());
+			if (OtherMeshComp == MeshComp) // both hands are grabbing the same object
+				Modifier = 0.5; 
+		}
+		
+		Grip -= Mass * (0.05/50) * DeltaTime * Modifier; // one hand can hold a 50kg object for 20 seconds, scales by weight
 		
 		if (Grip < 0.f)
 			Grip = 0.f;

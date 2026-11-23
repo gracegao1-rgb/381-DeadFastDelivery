@@ -71,7 +71,7 @@ private:
 	void TryGrabbing(USphereComponent* Hand, UPhysicsHandleComponent* Handle, FTransform& OutGrabOffset);
 	
 	// Called in tick
-	void UpdateGrip(UPhysicsHandleComponent* Handle, float& Grip, float DeltaTime);
+	void UpdateGrip(UPhysicsHandleComponent* Handle, UPhysicsHandleComponent* OtherHandle, float& Grip, float DeltaTime);
 
 	FVector LeftHandRelativeLocation = FVector(150.f, -40.f, -10.f);
 	FVector RightHandRelativeLocation = FVector(150.f,40.f, -10.f);
