@@ -16,6 +16,8 @@ public:
 	ADeliveryItem();
 	
 	bool bIsDelivered = false;
+	
+	bool bIsBeingGrabbed = false;
 
 protected:
 	// Called when the game starts or when spawned
@@ -23,6 +25,9 @@ protected:
 	
 	UFUNCTION()
 	virtual void HandleHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	
+	// Called when item breaks
+	void HandleDestroy();
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> Mesh;
@@ -37,7 +42,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Tuning")
 	int ZoneIdentifier = 0;
 	
-	float Health = 100.f;
+	UPROPERTY(EditAnywhere, Category = "Tuning")
+	bool HasDurability = false;
+	
+	UPROPERTY(EditAnywhere, Category = "Tuning")
+	float Health = 20.f;	
 
 public:	
 	// what happens when this object enters the delivery zone

@@ -89,22 +89,30 @@ void ADeliveryItem::HandleHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 {
 	// Ignore hitting ourselves, our owner, or hands
 	if (OtherActor == this || OtherActor == GetOwner())
-	{
 		return;
-	}
 	if (OtherActor && (OtherActor->IsA<ADeadFastDeliveryCharacter>() || OtherActor->IsA<UHandsComponent>()))
-	{
 		return;
-	}
+
+	if (!HasDurability)
+		return;
+	if (bIsBeingGrabbed) // don't apply damage when being grabbed
+		return;
 	
 	UClass* ActorClass = OtherActor->GetClass();
 	float ImpactForce = NormalImpulse.Size()/Mesh->GetMass()/100; // Newton Seconds
-	if (ImpactForce > 1.0f)
+	if (ImpactForce > 5.0f)
 	{
 		Health -= ImpactForce;
+		if (Health <= 0.0f)
+			HandleDestroy();
 		
 		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green,FString::Printf(TEXT("Object hit! %s"), *ActorClass->GetName()));
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green,FString::Printf(TEXT("Health Remaining! %f"), Health));
 	}
+}
+
+void ADeliveryItem::HandleDestroy()
+{
+	Destroy();
 }
 

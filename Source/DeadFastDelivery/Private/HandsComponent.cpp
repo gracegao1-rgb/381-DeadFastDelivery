@@ -2,6 +2,8 @@
 
 
 #include "HandsComponent.h"
+
+#include "DeliveryItem.h"
 #include "Engine/OverlapResult.h"
 
 UHandsComponent::UHandsComponent()
@@ -171,12 +173,20 @@ void UHandsComponent::StartGrabbing()
 
 void UHandsComponent::StopGrabbing()
 {
-	if (LeftHandle)
+	if (LeftHandle && LeftHandle->GetGrabbedComponent())
 	{
+		if (ADeliveryItem* Item = Cast<ADeliveryItem>(LeftHandle->GetGrabbedComponent()->GetOwner()))
+		{
+			Item->bIsBeingGrabbed = false;
+		}
 		LeftHandle->ReleaseComponent();
 	}
-	if (RightHandle)
+	if (RightHandle && RightHandle->GetGrabbedComponent())
 	{
+		if (ADeliveryItem* Item = Cast<ADeliveryItem>(RightHandle->GetGrabbedComponent()->GetOwner()))
+		{
+			Item->bIsBeingGrabbed = false;
+		}
 		RightHandle->ReleaseComponent();
 	}
 	
@@ -244,15 +254,16 @@ void UHandsComponent::TryGrabbing(USphereComponent* Hand, UPhysicsHandleComponen
 		// the current position of the hand, relative to the object getting grabbed
 		OutGrabOffset = BestObjectTransform.GetRelativeTransform(HandTransform);
 		
+		// attach mesh to component
 		Handle->GrabComponentAtLocationWithRotation(Best, NAME_None, BestObjectTransform.GetLocation(), BestObjectTransform.Rotator());
 		
+		// make the hands have no collision to make it easier to move around
 		Hand->SetCollisionProfileName(TEXT("NoCollision"));
 		
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			2.0f,
-			FColor::Blue, 
-			TEXT("Found an object to grab")        
-		);
+		// tell the item that they are being grabbed
+		if (ADeliveryItem* Item = Cast<ADeliveryItem>(Best->GetOwner()))
+		{
+			Item->bIsBeingGrabbed = true;
+		}
 	}
 }
