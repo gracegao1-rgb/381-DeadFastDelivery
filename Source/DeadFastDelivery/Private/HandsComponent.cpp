@@ -150,7 +150,10 @@ void UHandsComponent::UpdateGrip(UPhysicsHandleComponent* Handle, UPhysicsHandle
 		Grip -= Mass * (0.05/50) * DeltaTime * Modifier; // one hand can hold a 50kg object for 20 seconds, scales by weight
 		
 		if (Grip < 0.f)
+		{
 			Grip = 0.f;
+			Handle->ReleaseComponent();
+		}
 	}
 	// Replenish grip when not grabbing object
 	else
