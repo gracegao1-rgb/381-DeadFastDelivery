@@ -43,6 +43,9 @@ void UMainMenuWidget::HandleAction(EMenuActions Action)
 	case EMenuActions::LoadLevelMet:
 		LoadLevel(TEXT("/Game/Levels/Lvl_THE_MET"));
 		break;
+	case EMenuActions::LoadLevelGrandCentral:
+		LoadLevel(TEXT("/Game/Levels/Lvl_GrandCentral"));
+		break;
 	default:
 		break;
 	}
@@ -61,5 +64,11 @@ void UMainMenuWidget::QuitGame() const
 
 void UMainMenuWidget::LoadLevel(FName LevelName) const
 {
+	if (APlayerController* PC = GetOwningPlayer())
+	{
+		PC->SetInputMode(FInputModeGameOnly());
+		PC->SetShowMouseCursor(false);
+		PC->SetIgnoreLookInput(false);
+	}
 	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
 }
