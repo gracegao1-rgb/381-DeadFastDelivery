@@ -37,26 +37,33 @@ void AInteractableLock::RunAway()
 }
 
 // Called every frame
-void AInteractableLock::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	
-	if (bUnlocked)
-	{
-		FVector NewLoc = FMath::VInterpTo(GetActorLocation(), EndLocation, DeltaTime, 2.f);
-		SetActorLocation(NewLoc);
-
-		if (NewLoc.Equals(EndLocation, 1.f))
-		{
-			SetActorLocation(EndLocation);
-			bUnlocked = false;
-		}
-	}
-}
+// void AInteractableLock::Tick(float DeltaTime)
+// {
+// 	Super::Tick(DeltaTime);
+// 	
+// 	if (bUnlocked)
+// 	{
+// 		FVector NewLoc = FMath::VInterpTo(GetActorLocation(), EndLocation, DeltaTime, 2.f);
+// 		SetActorLocation(NewLoc);
+//
+// 		if (NewLoc.Equals(EndLocation, 1.f))
+// 		{
+// 			SetActorLocation(EndLocation);
+// 			bUnlocked = false;
+// 		}
+// 	}
+// }
 
 void AInteractableLock::Unlock()
 {
 	bUnlocked = true;
+	DisableMeshCollision(); // can pass through gate
+	
+	GEngine->AddOnScreenDebugMessage(
+	3,
+	2.0f,
+	FColor::Green, 
+	TEXT("You can now pass through the gate!"));
 }
 
 void AInteractableLock::HandleOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Sweep)
@@ -68,14 +75,32 @@ void AInteractableLock::HandleOverlap(UPrimitiveComponent* OverlappedComp, AActo
 			3,
 			2.0f,
 			FColor::Green, 
-			TEXT("Arrived at hatch")        
+			TEXT("Arrived at gate")        
 		);
 		
 		if (ADeadFastDeliveryGameMode* Gm = GetWorld()->GetAuthGameMode<ADeadFastDeliveryGameMode>())
 		{
-			RunAway(); // generate new location
+			// RunAway(); // generate new location
 			// report hatch reached
 			Gm->ReportLockReached();
 		}
+	}
+}
+
+void AInteractableLock::DisableMeshCollision()
+{
+	if (bCollisionDisabled) return;
+	bCollisionDisabled = true;
+
+	if (IsValid(TargetMesh) && IsValid(BlockingMesh))
+	{
+		TargetMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		BlockingMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		SignMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GEngine->AddOnScreenDebugMessage(
+			3,
+			2.0f,
+			FColor::Green, 
+			TEXT("disabled collision"));
 	}
 }

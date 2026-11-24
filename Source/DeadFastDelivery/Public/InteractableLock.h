@@ -31,9 +31,21 @@ protected:
 
 public:	
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	// virtual void Tick(float DeltaTime) override;
 	
 	void Unlock();
+	
+	void DisableMeshCollision();
+	bool bCollisionDisabled = false;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Collision")
+	TObjectPtr<UStaticMeshComponent> TargetMesh;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Collision")
+	TObjectPtr<UStaticMeshComponent> BlockingMesh;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Collision")
+	TObjectPtr<UStaticMeshComponent> SignMesh;
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))

@@ -32,6 +32,8 @@ void UMainMenuWidget::HandleSwitchPage(int32 TargetIndex)
 
 void UMainMenuWidget::HandleAction(EMenuActions Action)
 {
+	UE_LOG(LogTemp, Warning, TEXT("HandleAction: %s (%d)"),
+		*UEnum::GetValueAsString(Action), static_cast<int32>(Action));
 	switch (Action)
 	{
 	case EMenuActions::QuitGame:

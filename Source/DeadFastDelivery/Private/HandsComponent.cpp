@@ -6,6 +6,7 @@
 #include "DeliveryItem.h"
 #include "NiagaraTypes.h"
 #include "Engine/OverlapResult.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 UHandsComponent::UHandsComponent()
 {
@@ -26,11 +27,11 @@ void UHandsComponent::BeginPlay()
 	// Create Hands
 	if (!LeftHand)
 	{
-		LeftHand  = CreateHand(TEXT("LeftHand"),  LeftHandRelativeLocation);
+		LeftHand  = CreateHand(TEXT("LeftHand"),  LeftHandRelativeLocation, LeftArmSegment);
 	}
 	if (!RightHand)
 	{
-		RightHand = CreateHand(TEXT("RightHand"), RightHandRelativeLocation);
+		RightHand = CreateHand(TEXT("RightHand"), RightHandRelativeLocation, RightArmSegment);
 	}
 	
 	// Create Handles
@@ -45,16 +46,37 @@ void UHandsComponent::BeginPlay()
 }
 
 // Helper method to create each hand
-USphereComponent* UHandsComponent::CreateHand(const FName Name, const FVector& HandRelativeLocation)
+USphereComponent* UHandsComponent::CreateHand(const FName Name, const FVector& HandRelativeLocation, TObjectPtr<UStaticMeshComponent>& OutArmSegment)
 {
 	AActor* Owner = GetOwner();
 	if (!Owner) { return nullptr; }
+	
+	// create arm
+	OutArmSegment = NewObject<UStaticMeshComponent>(Owner, FName(*FString::Printf(TEXT("%s_Arm"), *Name.ToString())));
+	OutArmSegment->SetupAttachment(Owner->GetRootComponent());
+	OutArmSegment->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	OutArmSegment->SetCastShadow(false);
+	if (UStaticMesh* Cyl = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cylinder.Cylinder")))
+	{
+		OutArmSegment->SetStaticMesh(Cyl);
+	}
+	OutArmSegment->RegisterComponent();
+	
+	// set arm color
+	UMaterialInterface* Base = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/gltf/Textures/M_Green.M_Green"));
+	if (Base)
+	{
+		OutArmSegment->SetMaterial(0, Base);
+	}
 
+	// create hand
 	USphereComponent* Sphere = NewObject<USphereComponent>(Owner, Name);
 	Sphere->SetupAttachment(this);
 	Sphere->InitSphereRadius(8.f);
 	Sphere->SetRelativeLocation(HandRelativeLocation);
 	Sphere->SetCollisionProfileName(TEXT("BlockAll"));
+	OutArmSegment->SetCollisionResponseToAllChannels(ECR_Ignore);
+	OutArmSegment->SetGenerateOverlapEvents(false);
 	Sphere->RegisterComponent();
 	Sphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	
@@ -108,6 +130,13 @@ void UHandsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		RightHand->SetWorldLocation(DesiredLocRight, true);
 		RightHand->SetWorldRotation(ViewQuat * RightHandRot.Quaternion(), false);
 	}
+	
+	// arm rotation
+	const FQuat ArmViewQuat = OwnerPawn->GetControlRotation().Quaternion();
+	const FVector ArmOrigin = OwnerPawn->GetPawnViewLocation();
+
+	UpdateArm(LeftArmSegment,  LeftHand,  LeftShoulderLocal,  Origin, ViewQuat);
+	UpdateArm(RightArmSegment, RightHand, RightShoulderLocal, Origin, ViewQuat);
 	
 	// Set location of grabbed object to hands with offset 
 	if (LeftHandle && LeftHandle->GetGrabbedComponent() && LeftHand)
@@ -179,6 +208,25 @@ void UHandsComponent::SetHandRotation(int HandOption, const FRotator& Rot)
 	}
 }
 
+void UHandsComponent::UpdateArm(UStaticMeshComponent* Arm, USphereComponent* Hand, const FVector& ShoulderLocal, const FVector& Origin, const FQuat& ViewQuat)
+{
+	if (!Arm || !Hand) return;
+
+	// Shoulder: fixed point in view space, rotated by the same ViewQuat as the hands
+	const FVector Shoulder = Origin + ViewQuat.RotateVector(ShoulderLocal);
+
+	// Hand: read where it actually is (already world space)
+	const FVector HandPos = Hand->GetComponentLocation();
+
+	const FVector Dir = HandPos - Shoulder;
+	const float Len = Dir.Size();
+	if (Len < KINDA_SMALL_NUMBER) return;
+
+	Arm->SetWorldLocation((Shoulder + HandPos) * 0.5f); // midpoint
+	Arm->SetWorldRotation(FRotationMatrix::MakeFromZ(Dir).ToQuat()); // cylindar long axis is z
+	Arm->SetWorldScale3D(FVector(Thickness / 100.f, Thickness / 100.f, Len / 100.f));
+}
+
 // Helper method to create each physics handle
 UPhysicsHandleComponent* UHandsComponent::CreateHandle() const
 {
@@ -201,6 +249,11 @@ UPhysicsHandleComponent* UHandsComponent::CreateHandle() const
 
 void UHandsComponent::StartGrabbing()
 {
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetOwner());
+	if (LeftArmSegment)  Params.AddIgnoredComponent(LeftArmSegment.Get());
+	if (RightArmSegment) Params.AddIgnoredComponent(RightArmSegment.Get());
+	
 	TryGrabbing(LeftHand, LeftHandle, LeftGrabOffset);
 	TryGrabbing(RightHand, RightHandle, RightGrabOffset);
 	

@@ -62,9 +62,29 @@ public:
 	FVector HandOffset = FVector(200, 0, 0); // rest offset from the pivot
 
 	void SetHandRotation(int HandOption, const FRotator& Rot);
+	
+	// arms
+	UPROPERTY(VisibleAnywhere, Category = "Arm")
+	TObjectPtr<UStaticMeshComponent> LeftArmSegment;
+
+	UPROPERTY(VisibleAnywhere, Category = "Arm")
+	TObjectPtr<UStaticMeshComponent> RightArmSegment;
+	
+	void UpdateArm(UStaticMeshComponent* Arm, USphereComponent* Hand, const FVector& ShoulderLocal, const FVector& Origin, const FQuat& ViewQuat);
+
+	UPROPERTY(EditAnywhere, Category = "Arm")
+	float Thickness = 20.f;
+	
+	UPROPERTY() TObjectPtr<UMaterialInterface> ArmBaseMaterial; // arm color
+
+	UPROPERTY(EditAnywhere, Category = "Arm")
+	FVector LeftShoulderLocal = FVector(20.f, -30.f, -35.f);
+
+	UPROPERTY(EditAnywhere, Category = "Arm")
+	FVector RightShoulderLocal = FVector(20.f, 30.f, -35.f);
 
 private:
-	USphereComponent* CreateHand(const FName Name, const FVector& HandRelativeLocation);
+	USphereComponent* CreateHand(const FName Name, const FVector& HandRelativeLocation, TObjectPtr<UStaticMeshComponent>& OutArmSegment);
 	
 	UPhysicsHandleComponent* CreateHandle() const;
 	
