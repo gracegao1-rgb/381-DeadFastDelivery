@@ -55,6 +55,9 @@ protected:
 	
 public:
 	ADeadFastDeliveryCharacter();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Arm")
+	FRotator MeshRotationOffset = FRotator::ZeroRotator;
 
 protected:
 

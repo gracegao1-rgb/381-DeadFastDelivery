@@ -70,7 +70,7 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Arm")
 	TObjectPtr<UStaticMeshComponent> RightArmSegment;
 	
-	void UpdateArm(UStaticMeshComponent* Arm, USphereComponent* Hand, const FVector& ShoulderLocal, const FVector& Origin, const FQuat& ViewQuat);
+	void UpdateArm(UStaticMeshComponent* Arm, USphereComponent* Hand, const FVector& ShoulderLocal, const FVector& Origin, const FQuat& ViewQuat, bool bMirror);
 
 	UPROPERTY(EditAnywhere, Category = "Arm")
 	float Thickness = 20.f;
@@ -78,10 +78,13 @@ public:
 	UPROPERTY() TObjectPtr<UMaterialInterface> ArmBaseMaterial; // arm color
 
 	UPROPERTY(EditAnywhere, Category = "Arm")
-	FVector LeftShoulderLocal = FVector(20.f, -30.f, -35.f);
+	FVector LeftShoulderLocal = FVector(0.f, -30.f, -35.f);
 
 	UPROPERTY(EditAnywhere, Category = "Arm")
-	FVector RightShoulderLocal = FVector(20.f, 30.f, -35.f);
+	FVector RightShoulderLocal = FVector(0.f, 30.f, -35.f);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Arm")
+	FRotator MeshRotationOffset = FRotator::ZeroRotator;
 
 private:
 	USphereComponent* CreateHand(const FName Name, const FVector& HandRelativeLocation, TObjectPtr<UStaticMeshComponent>& OutArmSegment);

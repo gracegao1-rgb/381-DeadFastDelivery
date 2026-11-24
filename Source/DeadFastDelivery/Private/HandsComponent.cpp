@@ -3,6 +3,7 @@
 
 #include "HandsComponent.h"
 
+#include "DeadFastDeliveryCharacter.h"
 #include "DeliveryItem.h"
 #include "NiagaraTypes.h"
 #include "Engine/OverlapResult.h"
@@ -56,9 +57,9 @@ USphereComponent* UHandsComponent::CreateHand(const FName Name, const FVector& H
 	OutArmSegment->SetupAttachment(Owner->GetRootComponent());
 	OutArmSegment->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	OutArmSegment->SetCastShadow(false);
-	if (UStaticMesh* Cyl = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cylinder.Cylinder")))
+	if (UStaticMesh* Arm = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Fab/lowpoly_arm/StaticMeshes/Armp__0.Armp__0")))
 	{
-		OutArmSegment->SetStaticMesh(Cyl);
+		OutArmSegment->SetStaticMesh(Arm);
 	}
 	OutArmSegment->RegisterComponent();
 	
@@ -135,8 +136,8 @@ void UHandsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	const FQuat ArmViewQuat = OwnerPawn->GetControlRotation().Quaternion();
 	const FVector ArmOrigin = OwnerPawn->GetPawnViewLocation();
 
-	UpdateArm(LeftArmSegment,  LeftHand,  LeftShoulderLocal,  Origin, ViewQuat);
-	UpdateArm(RightArmSegment, RightHand, RightShoulderLocal, Origin, ViewQuat);
+	UpdateArm(LeftArmSegment,  LeftHand,  LeftShoulderLocal,  Origin, ViewQuat, true);
+	UpdateArm(RightArmSegment, RightHand, RightShoulderLocal, Origin, ViewQuat, false);
 	
 	// Set location of grabbed object to hands with offset 
 	if (LeftHandle && LeftHandle->GetGrabbedComponent() && LeftHand)
@@ -208,23 +209,58 @@ void UHandsComponent::SetHandRotation(int HandOption, const FRotator& Rot)
 	}
 }
 
-void UHandsComponent::UpdateArm(UStaticMeshComponent* Arm, USphereComponent* Hand, const FVector& ShoulderLocal, const FVector& Origin, const FQuat& ViewQuat)
+void UHandsComponent::UpdateArm(UStaticMeshComponent* Arm, USphereComponent* Hand,
+								const FVector& ShoulderLocal,
+								const FVector& Origin, const FQuat& ViewQuat, bool bMirror)
 {
 	if (!Arm || !Hand) return;
 
-	// Shoulder: fixed point in view space, rotated by the same ViewQuat as the hands
 	const FVector Shoulder = Origin + ViewQuat.RotateVector(ShoulderLocal);
-
-	// Hand: read where it actually is (already world space)
-	const FVector HandPos = Hand->GetComponentLocation();
+	const FVector HandPos  = Hand->GetComponentLocation();
 
 	const FVector Dir = HandPos - Shoulder;
-	const float Len = Dir.Size();
-	if (Len < KINDA_SMALL_NUMBER) return;
+	if (Dir.SizeSquared() < KINDA_SMALL_NUMBER) return;
 
-	Arm->SetWorldLocation((Shoulder + HandPos) * 0.5f); // midpoint
-	Arm->SetWorldRotation(FRotationMatrix::MakeFromZ(Dir).ToQuat()); // cylindar long axis is z
-	Arm->SetWorldScale3D(FVector(Thickness / 100.f, Thickness / 100.f, Len / 100.f));
+	const FQuat Offset = FRotator(-60.f, 180.f, 280.f).Quaternion();
+	const float S = 0.5f;
+
+	FQuat Final;
+	FVector Scale(S);
+
+	if (!bMirror)
+	{
+		Final = FRotationMatrix::MakeFromXZ(Dir, ViewQuat.GetUpVector()).ToQuat() * Offset;
+	}
+	else
+	{
+		// Reflect across the view's center plane (normal = view right)
+		const FVector N = ViewQuat.GetAxisY();
+		auto Reflect = [&N](const FVector& V) { return V - 2.f * FVector::DotProduct(V, N) * N; };
+
+		// Build the right arm's orientation for the mirrored direction
+		const FQuat RightFinal =
+			FRotationMatrix::MakeFromXZ(Reflect(Dir), ViewQuat.GetUpVector()).ToQuat() * Offset;
+
+		// Reflect its axes, then negate local Z (matches the Z flip in Scale) to get a valid rotation
+		const FVector X = Reflect(RightFinal.GetAxisX());
+		const FVector Y = Reflect(RightFinal.GetAxisY());
+		const FVector Z = Reflect(RightFinal.GetAxisZ());
+		Final = FQuat(FMatrix(X, Y, -Z, FVector::ZeroVector));
+
+		Scale = FVector(S, S, -S);
+	}
+
+	FVector LocalCenter = FVector::ZeroVector;
+	if (const UStaticMesh* Mesh = Arm->GetStaticMesh())
+	{
+		LocalCenter = Mesh->GetBounds().Origin;
+	}
+
+	const FVector Mid = (Shoulder + HandPos) * 0.5f;
+
+	Arm->SetWorldRotation(Final);
+	Arm->SetWorldScale3D(Scale);
+	Arm->SetWorldLocation(Mid - Final.RotateVector(LocalCenter * Scale));
 }
 
 // Helper method to create each physics handle
