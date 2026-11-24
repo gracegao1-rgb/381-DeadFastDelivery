@@ -142,6 +142,8 @@ protected:
 	bool bShouldDriftDown = false;
 	
 	void ToggleDrift();
+	
+	int PuddleCount = 0; // counts the number of overlapping puddles a person is in
 
 public:
 	/** Returns the first person mesh **/
@@ -150,6 +152,11 @@ public:
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 	
+	void ToggleFriction(bool bEnable);
+	
+	void EnterPuddle();
+	
+	void ExitPuddle();
 	
 	float GetLeftHandGrip() const {return HandsComponent->GetLeftHandGrip();}
 	float GetRightHandGrip() const {return HandsComponent->GetRightHandGrip();}

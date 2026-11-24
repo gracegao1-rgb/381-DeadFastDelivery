@@ -224,3 +224,38 @@ void ADeadFastDeliveryCharacter::ToggleDrift()
 {
 	bShouldDriftDown = !bShouldDriftDown;
 }
+
+
+void ADeadFastDeliveryCharacter::ToggleFriction(bool bEnable)
+{
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+	{
+		if (!bEnable)
+		{
+			MoveComp->GroundFriction = 0.0f;
+			MoveComp->BrakingDecelerationWalking = 150.0f;
+		}
+		else
+		{
+			// restore defaults
+			MoveComp->GroundFriction = 8.0f;
+			MoveComp->BrakingDecelerationWalking = 2048.0f;
+		}
+	}
+}
+
+void ADeadFastDeliveryCharacter::EnterPuddle()
+{
+	PuddleCount++;
+	
+	if (PuddleCount == 1)
+		ToggleFriction(false);
+}
+
+void ADeadFastDeliveryCharacter::ExitPuddle()
+{
+	PuddleCount--;
+	
+	if (PuddleCount == 0) 
+		ToggleFriction(true);
+}
