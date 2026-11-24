@@ -343,7 +343,7 @@ void UHandsComponent::TryGrabbing(USphereComponent* Hand, UPhysicsHandleComponen
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(HandGrab), false, GetOwner());
 
 	const FVector Center = Hand->GetComponentLocation();
-	const float Reach = Hand->GetScaledSphereRadius() * 1.5f;
+	const float Reach = Hand->GetScaledSphereRadius() * 2.f;
 
 	TArray<FOverlapResult> Overlaps;
 	GetWorld()->OverlapMultiByObjectType(Overlaps, Center, FQuat::Identity,

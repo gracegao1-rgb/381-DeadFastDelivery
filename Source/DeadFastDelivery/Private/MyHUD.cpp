@@ -5,6 +5,7 @@
 
 #include "DeadFastDeliveryCharacter.h"
 #include "DeadFastDeliveryGameMode.h"
+#include "MyWorldSettings.h"
 
 AMyHUD::AMyHUD()
 {
@@ -45,6 +46,31 @@ void AMyHUD::BeginPlay()
 		{
 			PauseMenuWidget->AddToViewport(10);
 			PauseMenuWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+	
+	// get level instructions modal from world settings
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	const AMyWorldSettings* WS = Cast<AMyWorldSettings>(World->GetWorldSettings());
+	if (WS && WS->LevelInstructionsModal)
+	{
+		if (APlayerController* PC = GetOwningPlayerController())
+		{
+			InstructionsModalWidget = CreateWidget<UModalWidget>(PC, WS->LevelInstructionsModal);
+			if (InstructionsModalWidget)
+			{
+				InstructionsModalWidget->AddToViewport();
+				
+				FInputModeGameAndUI InputMode;
+				InputMode.SetWidgetToFocus(InstructionsModalWidget->TakeWidget());
+				InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+
+				PC->SetInputMode(InputMode);
+				PC->SetShowMouseCursor(true);
+				PC->SetIgnoreLookInput(true);
+			}
 		}
 	}
 }
@@ -102,4 +128,17 @@ void AMyHUD::TogglePauseMenu()
 		PC->SetIgnoreLookInput(false);
 		PC->SetPause(false);
 	}
+}
+
+void AMyHUD::HideInstructionsModal()
+{
+	APlayerController* PC = GetOwningPlayerController();
+	if (!PC) return;
+	
+	PC->SetInputMode(FInputModeGameOnly());
+	PC->SetShowMouseCursor(false);
+	PC->SetIgnoreLookInput(false);
+	
+	if (InstructionsModalWidget)
+		InstructionsModalWidget->RemoveFromParent();
 }

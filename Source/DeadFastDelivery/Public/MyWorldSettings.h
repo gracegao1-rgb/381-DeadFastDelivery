@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ModalWidget.h"
 #include "GameFramework/WorldSettings.h"
 #include "MyWorldSettings.generated.h"
 
@@ -17,4 +18,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Tuning", meta = (ClampMin = "0.0", Units = "s"))
 	float LevelSeconds = 300.f;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tuning")
+	TSubclassOf<UModalWidget> LevelInstructionsModal; // Showed at the start of the level
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "HUDWidget.h"
+#include "ModalWidget.h"
 #include "PauseMenuWidget.h"
 #include "GameFramework/HUD.h"
 #include "MyHUD.generated.h"
@@ -22,6 +23,8 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	
 	void TogglePauseMenu();
+	
+	void HideInstructionsModal();
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UHUDWidget> HUDWidgetClass;
@@ -33,6 +36,8 @@ protected:
 	UPROPERTY() UHUDWidget* HUDWidget;
 	
 	UPROPERTY() UPauseMenuWidget* PauseMenuWidget;
+	
+	UPROPERTY() UModalWidget* InstructionsModalWidget;
 	
 	bool bIsPaused = false;
 };
