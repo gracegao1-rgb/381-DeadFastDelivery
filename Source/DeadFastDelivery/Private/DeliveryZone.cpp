@@ -56,7 +56,6 @@ void ADeliveryZone::OnBoxOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
 		ADeliveryItem* Item = static_cast<ADeliveryItem*>(OtherActor);
 		Item->HandleEndZoneOverlap();
 	}
-	
 }
 
 

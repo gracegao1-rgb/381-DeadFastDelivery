@@ -166,6 +166,15 @@ void ADeliveryItem::HandleDestroy()
 	Mesh->SetVisibility(false);
 	ExplosionEffect->Activate();
 	
+	if (bIsDelivered)
+	{
+		bIsDelivered = false;
+		if (ADeadFastDeliveryGameMode* Gm = GetWorld()->GetAuthGameMode<ADeadFastDeliveryGameMode>())
+		{
+			Gm->UpdateNumberOfDeliveredItems();
+		}
+	}
+	
 	SetLifeSpan(3.0f);
 }
 
