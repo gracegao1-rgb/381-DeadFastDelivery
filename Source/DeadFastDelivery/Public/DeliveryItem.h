@@ -58,6 +58,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Tuning")
 	float DamageThreshold = 4.f;
 	
+	UPROPERTY(EditAnywhere, Category = "Tuning")
+	float DamageCeiling = 10.f;
+	
 	// scoring
 	UPROPERTY(EditAnywhere, Category = "Tuning")
 	int32 CostPerHealth = 10; // current value is Health * CostPerHealth

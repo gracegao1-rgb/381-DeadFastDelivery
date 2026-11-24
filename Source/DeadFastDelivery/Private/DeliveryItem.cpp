@@ -132,7 +132,7 @@ void ADeliveryItem::HandleHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 	float ImpactForce = NormalImpulse.Size()/Mesh->GetMass()/100; // Newton Seconds
 	if (ImpactForce > DamageThreshold)
 	{
-		const float HealthLost = FMath::Min(Health, ImpactForce);
+		const float HealthLost = FMath::Min(FMath::Min(DamageCeiling, ImpactForce), Health);
 		Health -= HealthLost;
 
 		const float CostLost = HealthLost * CostPerHealth;
